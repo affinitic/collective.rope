@@ -259,6 +259,15 @@ class ItemBrowserTests(FunctionalTestCase):
         # other can access properties page
         other.open(self.item_path + '/manage_workspace')
         self.assertEquals('200 OK', other.headers['status'])
+        # remove local role
+        browser = self.browser
+        browser.open(self.item_path + '/manage_listLocalRoles')
+        ctl = browser.getControl(name='userids:list')
+        ctl.value = ['other']
+        form = browser.getForm(index=0)
+        form.getControl(name='submit').click()
+        # other cannot access properties page anymore
+        self.assertRaises(HTTPError, other.open, self.item_path + '/manage_workspace')
 
 def test_suite():
     suite = unittest.TestSuite()
