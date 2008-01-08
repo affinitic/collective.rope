@@ -1,0 +1,6 @@
+Godefroid Chapelle <gotcha __at__ bubblenet.be>
+Laurent Mignon <laurent.mignon __at__ softwareag.com>
+
+Work funded by the Tabellio project (http://tabellio.org)
+
+Initial idea by Stéphane Bidoul <stephane.bidoul __at__ softwareag.com>

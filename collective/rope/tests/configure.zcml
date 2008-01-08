@@ -1,0 +1,16 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:five="http://namespaces.zope.org/five"
+           >
+
+    <five:registerPackage package="collective.rope" initialize=".initialize" />
+    
+    <adapter for="collective.rope.interfaces.IRDBFolder"
+             factory="collective.rope.basefolder.SubItemKeySupport" 
+             provides="collective.rope.interfaces.ISubItemKeySupport" />
+
+    <adapter for="collective.rope.interfaces.IStoredInRDB"
+             factory="collective.rope.basefolder.SubItemKeySupport" 
+             provides="collective.rope.interfaces.ISubItemKeySupport" />
+
+
+</configure>
