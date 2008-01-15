@@ -23,14 +23,18 @@ class IStoredInRDB(Interface):
 class IRDBFolder(Interface):
     """Zope 2 compliant folder that contains only objects stored in RDB"""
 
-class ISubItemKeySupport(Interface):
+class IKeyIdSubobjectSupport(Interface):
     """Id to Key support"""
 
     def makeIdFromKey(key):
-        """compute a Zope id from a key"""
+        """compute a Zope id from a key."""
 
     def makeKeyFromId(id):
-        """compute a RDB key from a Zope id"""
+        """compute a RDB key from a Zope id."""
 
-    def isSubItem(id):
-        """tells if an id conforms to the given conversion"""
+    def isSubobject(id):
+        """tells if an id conforms to the given conversion."""
+
+    def getIdsCursor():
+        """returns cursor that can fetch subobjec ids."""
+

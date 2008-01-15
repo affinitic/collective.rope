@@ -17,8 +17,6 @@
 
 import logging
 
-from sets import ImmutableSet
-
 from sqlalchemy import select
 
 from AccessControl import ClassSecurityInfo
@@ -40,27 +38,37 @@ from zope.app.container.contained import notifyContainerModified
 from collective.lead.interfaces import IDatabase
 
 from interfaces import IRDBFolder
-from interfaces import ISubItemKeySupport
+from interfaces import IKeyIdSubobjectSupport
 
 logger = logging.getLogger('Rope basefolder')
 
 _marker = object()
 
-class SubItemKeySupport(object):
+class KeyIdSubobjectSupport(object):
 
     subobjectSuffix = '_rf'
 
     def __init__(self, context):
-        pass
+        self.context = context
 
     def makeIdFromKey(self, key):
+        """see interfaces"""
         return key + self.subobjectSuffix
 
     def makeKeyFromId(self, id):
+        """see interfaces"""
         return id[:-len(self.subobjectSuffix)]
 
     def isSubobject(self, id):
+        """see interfaces"""
         return id.endswith(self.subobjectSuffix)
+
+    def getIdsCursor(self):
+        """see interfaces"""
+        selectQuery = str(select(
+            [(self.context._mapperClass.c.key+'suffix').label('zope_id')]))
+        cursor = self.context._session.execute(selectQuery, self.subobjectSuffix)
+        return cursor
 
 class BaseFolder(Folder):
     """subobjects stored outside ZODB through SQLAlchemy"""
@@ -95,27 +103,16 @@ class BaseFolder(Folder):
                               'objectIds')
     def objectIds(self):
         '''ids'''
-        selectQuery = str(select([self._mapperClass.c.key]))
-        cursor = self._session.execute(selectQuery)
+        cursor = IKeyIdSubobjectSupport(self).getIdsCursor()
         try:
             rows = cursor.fetchall()
         finally:
             # While the resources referenced by the ResultProxy will be
             # closed when the object is garbage collected, it's better
             # to make it explicit as some database APIs are very picky
-            #about such things
+            # about such things
             cursor.close()
-        #keep deleted objects in mind
-        deletedObjects = self._session.deleted
-        if deletedObjects:
-            deletedKeys = ImmutableSet([deleted.key for deleted in self._session.deleted])
-            #objects in db filtered
-            result = [ISubItemKeySupport(self).makeIdFromKey(row.key) for row in rows if row.key not in deletedKeys]
-        else:
-            result = [ISubItemKeySupport(self).makeIdFromKey(row.key) for row in rows]
-        #keep new objects in mind
-        for new in self._session.new:
-            result.append(new.getId())
+        result = [row.zope_id for row in rows]
         return result
 
     security.declareProtected(access_contents_information,
@@ -136,22 +133,24 @@ class BaseFolder(Folder):
     def __getattr__(self, path):
         if path == '__conform__':
             return Folder.__getattr__(self, path)
-        elif ISubItemKeySupport(self).isSubobject(path):
+        elif IKeyIdSubobjectSupport(self).isSubobject(path):
             return self.__getObjectFromSA__(path)
         else:
             return Folder.__getattr__(self, path)
 
     def __getObjectFromSA__(self, path):
-        key = ISubItemKeySupport(self).makeKeyFromId(path)
-        mapper = self._session.get(self._mapperClass, key)
-        if mapper is None:
+        #XXX should support multiple keys
+        key = IKeyIdSubobjectSupport(self).makeKeyFromId(path)
+        subobject = self._session.get(self._mapperClass, key)
+        if subobject is None:
             raise ValueError
         else:
-            result = mapper.__of__(self)
+            result = subobject.__of__(self)
             return result
 
-    def addObjectToDatabase(self, ob):
+    def __addObjectToSA__(self, ob):
         self._session.save(ob)
+        self._session.flush([ob])
 
     def _getOb(self, id, default=_marker):
         try:
@@ -161,14 +160,21 @@ class BaseFolder(Folder):
                 raise AttributeError, id
             return default
 
+    def _setObject(self, id, ob):
+        self.__addObjectToSA__(ob)
+
     def _delObject(self, id, dp=1, suppress_events=False):
         ob = self._getOb(id)
         
         if not suppress_events:
             notify(ObjectWillBeRemovedEvent(ob, self, id))
-       
+      
+        # When it was saved in the session, the object could not be acquisition
+        # wrapped. Thus, we need to unwrap it before we delete it from the
+        # session.
         mapper = aq_base(ob)
         self._session.delete(mapper)
+        self._session.flush([mapper])
         
         if not suppress_events:
             notify(ObjectRemovedEvent(ob, self, id))

@@ -26,46 +26,29 @@ from Testing.ZopeTestCase import FunctionalTestCase
 
 from Products.Five.testbrowser import Browser
 
-from collective.rope.tests.layer import RopeTestLayer
+from collective.rope.tests.testfolder import FOLDER_ID
+from collective.rope.tests.layer import Rope
 from collective.rope.tests.layer import setupDatabase 
 from collective.rope.tests.layer import DB_UTILITY_NAME
-from collective.rope.tests.layer import SIMPLE_MAPPER_NAME
+from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
 from collective.rope.tests.folder import manage_addRopeFolder
-from collective.rope.tests.item import manage_addRopeSimpleItem
+from collective.rope.tests.simpleitem import manage_addRopeSimpleItem
 
-FOLDER_ID = 'rope'
 ITEM_KEY = 'first'
 ITEM_ID = '%s_rf' % ITEM_KEY
 ITEM_TITLE = 'First Rope Simple'
 ITEM_VIEW = '%s (%s)' % (ITEM_ID, ITEM_TITLE)
 
-class FolderTests(ZopeTestCase):
-    layer = RopeTestLayer
-
-    def afterSetUp(self):
-        setupDatabase()
-
-    def testInstantiateFolder(self):
-        manage_addRopeFolder(self.folder,
-            FOLDER_ID, DB_UTILITY_NAME, SIMPLE_MAPPER_NAME)
-        self.failUnless(FOLDER_ID in self.folder.objectIds())
-
-    def testDeleteFolder(self):
-        manage_addRopeFolder(self.folder,
-            FOLDER_ID, DB_UTILITY_NAME, SIMPLE_MAPPER_NAME)
-        self.folder.manage_delObjects([FOLDER_ID])
-        self.failIf(FOLDER_ID in self.folder.objectIds())
-
-class SimpleItemBase(ZopeTestCase):
-    layer = RopeTestLayer
+class SimpleItemBaseTests(ZopeTestCase):
+    layer = Rope
 
     def afterSetUp(self):
         setupDatabase()
         manage_addRopeFolder(self.folder,
-            FOLDER_ID, DB_UTILITY_NAME, SIMPLE_MAPPER_NAME)
+            FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
         self.rope = getattr(self.folder, FOLDER_ID)
 
-class SimpleItemTests(SimpleItemBase):
+class SimpleItemTests(SimpleItemBaseTests):
 
     def testInstantiateSimpleItem(self):
         rope = self.rope
@@ -95,12 +78,14 @@ class SimpleItemTests(SimpleItemBase):
         self.assertEquals(ITEM_KEY, item.key)
         self.assertEquals(ITEM_ID, item.getId())
 
-class SimpleItemTestsWithCommits(SimpleItemBase):
+class SimpleItemTestsWithCommits(SimpleItemBaseTests):
     
     def beforeTearDown(self):
         transaction.abort()
         folderid = self.folder.getId()
         if folderid in self.app.objectIds():
+            rope = self.rope
+            rope.manage_delObjects(rope.objectIds())
             self.app.manage_delObjects([folderid])
             transaction.commit()
 
@@ -118,49 +103,8 @@ class SimpleItemTestsWithCommits(SimpleItemBase):
         transaction.commit()
         self.failUnless(ITEM_ID in rope.objectIds())
 
-class FolderBrowserTests(FunctionalTestCase):
-    layer = RopeTestLayer
-
-    def afterSetUp(self):
-        self.setRoles(['Manager'])
-        self.browser = Browser()
-        self.browser.handleErrors = False
-        self.browser.addHeader('Authorization', 'Basic %s:%s'%(user_name, user_password))
-        self.folder_path = 'http://localhost/' + self.folder.absolute_url(1)
-
-    def testAddRopeFolder(self):
-        browser = self.browser
-        browser.open(self.folder_path + '/manage_addProduct/collective.rope/folderAdd')
-        ctl = browser.getControl(name='id')
-        ctl.value = FOLDER_ID
-        ctl = browser.getControl(name='databaseName')
-        ctl.value = DB_UTILITY_NAME
-        ctl = browser.getControl(name='mapperName')
-        ctl.value = SIMPLE_MAPPER_NAME
-        browser.getControl(name="submit").click()
-        self.failUnless(FOLDER_ID in self.folder.objectIds()) 
-        rope = getattr(self.folder, FOLDER_ID)
-        self.assertEquals('Rope Folder', rope.meta_type)
-
-    def testViewRopeFolder(self):
-        manage_addRopeFolder(self.folder,
-            FOLDER_ID, DB_UTILITY_NAME, SIMPLE_MAPPER_NAME)
-        browser = self.browser
-        browser.open(self.folder_path + '/%s/manage_main' % FOLDER_ID)
-        self.failUnless('Rope Folder' in browser.contents) 
-
-    def testDeleteRopeFolder(self):
-        manage_addRopeFolder(self.folder,
-            FOLDER_ID, DB_UTILITY_NAME, SIMPLE_MAPPER_NAME)
-        browser = self.browser
-        browser.open(self.folder_path + '/manage_main')
-        ctl = browser.getControl(name='ids:list')
-        ctl.value = [FOLDER_ID] 
-        browser.getControl(name='manage_delObjects:method').click()
-        self.failIf(FOLDER_ID in self.folder.objectIds()) 
-
 class ItemBrowserTests(FunctionalTestCase):
-    layer = RopeTestLayer
+    layer = Rope
 
     def afterSetUp(self):
         setupDatabase()
@@ -170,7 +114,7 @@ class ItemBrowserTests(FunctionalTestCase):
         self.browser.addHeader('Authorization', 'Basic %s:%s'%(user_name, user_password))
         self.folder_path = 'http://localhost/' + self.folder.absolute_url(1)
         manage_addRopeFolder(self.folder,
-            FOLDER_ID, DB_UTILITY_NAME, SIMPLE_MAPPER_NAME)
+            FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
         self.rope = getattr(self.folder, FOLDER_ID)
         self.item_path = self.folder_path + '/%s/%s' % (FOLDER_ID, ITEM_ID)
 
@@ -271,10 +215,8 @@ class ItemBrowserTests(FunctionalTestCase):
 
 def test_suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(FolderTests))
     suite.addTest(unittest.makeSuite(SimpleItemTests))
     suite.addTest(unittest.makeSuite(SimpleItemTestsWithCommits))
-    suite.addTest(unittest.makeSuite(FolderBrowserTests))
     suite.addTest(unittest.makeSuite(ItemBrowserTests))
     return suite
 

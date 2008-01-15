@@ -5,12 +5,15 @@
     <five:registerPackage package="collective.rope" initialize=".initialize" />
     
     <adapter for="collective.rope.interfaces.IRDBFolder"
-             factory="collective.rope.basefolder.SubItemKeySupport" 
-             provides="collective.rope.interfaces.ISubItemKeySupport" />
+             factory="collective.rope.basefolder.KeyIdSubobjectSupport" 
+             provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
 
     <adapter for="collective.rope.interfaces.IStoredInRDB"
-             factory="collective.rope.basefolder.SubItemKeySupport" 
-             provides="collective.rope.interfaces.ISubItemKeySupport" />
+             factory="collective.rope.basefolder.KeyIdSubobjectSupport" 
+             provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
 
+    <include file="content.zcml"/>
+
+    <include file="profiles.zcml"/>
 
 </configure>

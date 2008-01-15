@@ -1,0 +1,16 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five">
+
+  <five:registerClass
+      class=".portalcontent.RopePortalContent"
+      meta_type="Rope Portal Content"
+      permission="cmf.AddPortalContent"
+      />
+
+  <utility
+      component=".portalcontent.RopePortalContentFactory"
+      name="rope.portalcontent"
+      />
+
+</configure>

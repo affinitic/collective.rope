@@ -24,7 +24,7 @@ from AccessControl import ClassSecurityInfo
 from AccessControl.Owned import Owned
 from AccessControl.Permissions import view as View
 
-from collective.rope.interfaces import ISubItemKeySupport
+from collective.rope.interfaces import IKeyIdSubobjectSupport
 from collective.rope.basesimple import BaseSimpleItem 
 
 class RopeSimpleItem(BaseSimpleItem, PropertyManager):
@@ -57,10 +57,10 @@ class RopeSimpleItem(BaseSimpleItem, PropertyManager):
         return '%s (%s)' % (self.id, self.title)
 
     def getId(self):
-        return ISubItemKeySupport(self).makeIdFromKey(self.key)
+        return IKeyIdSubobjectSupport(self).makeIdFromKey(self.key)
 
     def __setId(self, id):
-        self.key = ISubItemKeySupport(self).makeKeyFromId(id)
+        self.key = IKeyIdSubobjectSupport(self).makeKeyFromId(id)
 
     id = property(getId, __setId)
 
@@ -74,13 +74,13 @@ def manage_addRopeSimpleItem(dispatcher, id, title='', REQUEST=None):
     """
     class_ = dispatcher.getMapperClass()
     ob = class_()
-    ob = ob.__of__(dispatcher)
-    keySupport = ISubItemKeySupport(ob)
+    keySupport = IKeyIdSubobjectSupport(ob)
     if not keySupport.isSubobject(id):
         raise ValueError, "wrong id"
     ob.id = id
     ob.title = str(title)
-    dispatcher.addObjectToDatabase(ob)
+    dispatcher._setObject(id, ob)
+    ob = ob.__of__(dispatcher)
     if REQUEST is not None:
         return dispatcher.manage_main(dispatcher, REQUEST, update_menu=1)
 

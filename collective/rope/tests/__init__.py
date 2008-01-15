@@ -15,8 +15,9 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-import item
+import simpleitem
 import folder
+import portalcontent
 
 def initialize(context):
     context.registerClass(
@@ -26,7 +27,12 @@ def initialize(context):
         )
 
     context.registerClass(
-        item.RopeSimpleItem,
-        constructors=(item.manage_addRopeSimpleItemForm,
-                      item.manage_addRopeSimpleItem),
+        simpleitem.RopeSimpleItem,
+        constructors=(simpleitem.manage_addRopeSimpleItemForm,
+                      simpleitem.manage_addRopeSimpleItem),
+        )
+    context.registerClass(
+        portalcontent.RopePortalContent,
+        constructors=(simpleitem.manage_addRopeSimpleItemForm,
+                      simpleitem.manage_addRopeSimpleItem),
         )
