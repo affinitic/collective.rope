@@ -30,9 +30,9 @@ import collective.lead
 from collective.lead import Database
 from collective.lead.interfaces import IDatabase
 
-from collective.rope.basesimple import makeDictionary
-from collective.rope.basesimple import compareDictionary
-from collective.rope.baseatcontent import makeReferenceBag
+from collective.rope.utils import makeDictionary
+from collective.rope.utils import compareDictionary
+from collective.rope.utils import makeReferenceBag
 
 from Products.PloneTestCase.layer import PloneSite
 

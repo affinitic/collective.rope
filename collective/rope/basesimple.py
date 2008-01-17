@@ -28,12 +28,6 @@ from interfaces import IKeyIdSubobjectSupport
 
 _marker = object()
 
-def makeDictionary():
-    return {}
-
-def compareDictionary(x, y):
-    return x == y
-
 class BaseSimpleItem(object,
                     Item,
                     Implicit,

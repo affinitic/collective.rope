@@ -15,19 +15,6 @@ from collective.rope.baseportalcontent import BasePortalContent
 
 from zope.interface import implements
 
-def makeReferenceBag():
-    return ReferenceBag()
-
-class ReferenceBag(dict):
-    def objectValues(self):
-        return self.values()
-
-    def _setObject(self, rID, referenceObject):
-        self[rID] = referenceObject
-
-    def _delObject(self, rID):
-        del self[rID]
-
 # begin
 # copy from Archetypes.BaseContent 
 
