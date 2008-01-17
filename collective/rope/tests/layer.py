@@ -32,9 +32,13 @@ from collective.lead.interfaces import IDatabase
 
 from collective.rope.basesimple import makeDictionary
 from collective.rope.basesimple import compareDictionary
+from collective.rope.baseatcontent import makeReferenceBag
+
+from Products.PloneTestCase.layer import PloneSite
 
 SIMPLE_ITEM_MAPPER = 'm_simpleitem'
 PORTAL_CONTENT_MAPPER = 'm_portalcontent'
+AT_CONTENT_MAPPER = 'm_atcontent'
 DB_UTILITY_NAME='test.database'
 
 class TestDatabase(Database):
@@ -83,6 +87,23 @@ class TestDatabase(Database):
                sqlalchemy.Column('workflow_history', PickleDict,
                     default=makeDictionary),
                )
+        tables['t_atcontent'] = sqlalchemy.Table('t_atcontent', metadata,
+               sqlalchemy.Column('key', sqlalchemy.TEXT,
+                    sqlalchemy.ForeignKey('t_data.key'),
+                    primary_key=True),
+               # for Zope
+               sqlalchemy.Column('__roles__', sqlalchemy.PickleType),
+               sqlalchemy.Column('__ac_local_roles__', sqlalchemy.PickleType),
+               sqlalchemy.Column('__zope_permissions__', PickleDict,
+                    default=makeDictionary),
+               # for DCWorkflow
+               sqlalchemy.Column('workflow_history', PickleDict,
+                    default=makeDictionary),
+               # for Archetypes
+               sqlalchemy.Column('_at_uid', sqlalchemy.TEXT),
+               sqlalchemy.Column('at_references', sqlalchemy.PickleType,
+                    default=makeReferenceBag),
+               )
 
     def _setup_mappers(self, tables, mappers):
         t_data = tables['t_data']
@@ -95,6 +116,11 @@ class TestDatabase(Database):
         j = sqlalchemy.sql.join(t_data, t_portalcontent)
         from collective.rope.tests.portalcontent import RopePortalContent
         mappers[PORTAL_CONTENT_MAPPER] = sqlalchemy.orm.mapper(RopePortalContent, j)
+
+        t_atcontent = tables['t_atcontent']
+        j = sqlalchemy.sql.join(t_data, t_atcontent)
+        from collective.rope.tests.atcontent import RopeATContent
+        mappers[AT_CONTENT_MAPPER] = sqlalchemy.orm.mapper(RopeATContent, j)
 
 
 from zope.testing.cleanup import cleanUp as _cleanUp
@@ -175,23 +201,29 @@ except ImportError:
 else:
     ZCML.__bases__ = (ZopeLite,)
 
+def _setUpRope():
+    XMLConfig('configure.zcml', Products.Five)()
+    XMLConfig('configure.zcml', collective.lead)()
+    XMLConfig('meta.zcml', Products.GenericSetup)()
+    XMLConfig('configure.zcml', Products.GenericSetup)()
+    installPackage('collective.rope')
+    testDb = TestDatabase()
+    provideUtility(testDb, name=DB_UTILITY_NAME, provides=IDatabase)
+    setupDatabase()
+
+def _tearDownRope():
+    sqlalchemy.orm.clear_mappers()
+    sm = getSiteManager()
+    sm.unregisterUtility(name=DB_UTILITY_NAME, provided=IDatabase)
+
 class Rope(ZCML):
     @classmethod
     def setUp(cls):
-        XMLConfig('configure.zcml', Products.Five)()
-        XMLConfig('configure.zcml', collective.lead)()
-        XMLConfig('meta.zcml', Products.GenericSetup)()
-        XMLConfig('configure.zcml', Products.GenericSetup)()
-        installPackage('collective.rope')
-        testDb = TestDatabase()
-        provideUtility(testDb, name=DB_UTILITY_NAME, provides=IDatabase)
-        setupDatabase()
+        _setUpRope()
 
     @classmethod
     def tearDown(cls):
-        sqlalchemy.orm.clear_mappers()
-        sm = getSiteManager()
-        sm.unregisterUtility(name=DB_UTILITY_NAME, provided=IDatabase)
+        _tearDownRope()
 
 class Portal(ZCML):
     @classmethod
@@ -204,16 +236,23 @@ class Portal(ZCML):
         for func, args, kw in _deferred_cleanup:
             func(*args, **kw)
 
-class RopePortal(Rope):
+class RopePortal(Portal):
     @classmethod
     def setUp(cls):
-        for func, args, kw in _deferred_setup:
-            func(*args, **kw)
+        _setUpRope()
     
     @classmethod
     def tearDown(cls):
-        for func, args, kw in _deferred_cleanup:
-            func(*args, **kw)
+        _tearDownRope()
+
+class RopePloneSite(PloneSite):
+    @classmethod
+    def setUp(cls):
+        _setUpRope()
+    
+    @classmethod
+    def tearDown(cls):
+        _tearDownRope()
 
 def setupDatabase():
     database = getUtility(IDatabase, name=DB_UTILITY_NAME)

@@ -33,19 +33,6 @@ def makeDictionary():
 def compareDictionary(x, y):
     return x == y
 
-def makeReferenceBag():
-    return ReferenceBag()
-
-class ReferenceBag(dict):
-    def objectValues(self):
-        return self.values()
-
-    def _setObject(self, rID, referenceObject):
-        self[rID] = referenceObject
-
-    def _delObject(self, rID):
-        del self[rID]
-
 class BaseSimpleItem(object,
                     Item,
                     Implicit,
@@ -59,7 +46,7 @@ class BaseSimpleItem(object,
     def getId(self):
         raise NotImplementedError
 
-    __name__ = property(getId, __setId, None, 'Accesse to id') 
+    __name__ = property(getId, __setId, None, 'Access to id') 
     
     def __getattr__(self, key):
         attr = self.__zope_permissions__.get(key, _marker)

@@ -48,6 +48,12 @@ class FolderTests(ZopeTestCase):
         self.folder.manage_delObjects([FOLDER_ID])
         self.failIf(FOLDER_ID in self.folder.objectIds())
 
+    def testGetObError(self):
+        manage_addRopeFolder(self.folder,
+            FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
+        rope = getattr(self.folder, FOLDER_ID)
+        self.assertRaises(AttributeError, rope._getOb, 'notfound')
+
 class FolderBrowserTests(FunctionalTestCase):
     layer = Rope
 

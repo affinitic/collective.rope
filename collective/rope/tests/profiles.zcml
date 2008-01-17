@@ -11,4 +11,12 @@
       for="Products.CMFCore.interfaces.ISiteRoot"
       />
 
+  <genericsetup:registerProfile
+      name="ropeonat"
+      title="Rope On Archetypes Tests"
+      description="Tests of rope AT content"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      for="Products.CMFCore.interfaces.ISiteRoot"
+      />
+
 </configure>

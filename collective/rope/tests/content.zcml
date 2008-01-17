@@ -8,9 +8,20 @@
       permission="cmf.AddPortalContent"
       />
 
+  <five:registerClass
+      class=".atcontent.RopeATContent"
+      meta_type="Rope AT Content"
+      permission="cmf.AddPortalContent"
+      />
+
   <utility
-      component=".portalcontent.RopePortalContentFactory"
+      component=".portalcontent.RopeFactory"
       name="rope.portalcontent"
+      />
+
+  <utility
+      component=".atcontent.RopeATFactory"
+      name="rope.atcontent"
       />
 
 </configure>

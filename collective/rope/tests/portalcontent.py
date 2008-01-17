@@ -67,11 +67,11 @@ manage_addPortalContentForm = DTMLFile('simpleAdd', globals())
 def manage_addPortalContent(dispatcher, id, title='', REQUEST=None):
     """Adds a new PortalContent object with id *id*.
     """
-    _RopePortalContentFactory()
+    _RopeFactory()
     if REQUEST is not None:
         return dispatcher.manage_main(dispatcher, REQUEST, update_menu=1)
 
-def _RopePortalContentFactory(id, dbUtilityName, mapperName, title=''):
+def _RopeFactory(id, dbUtilityName, mapperName, title=''):
     db = getUtility(IDatabase, dbUtilityName)
     class_ = db.mappers[mapperName].class_
     ob = class_()
@@ -82,4 +82,4 @@ def _RopePortalContentFactory(id, dbUtilityName, mapperName, title=''):
     ob.title = str(title)
     return ob
 
-RopePortalContentFactory = Factory(_RopePortalContentFactory)
+RopeFactory = Factory(_RopeFactory)

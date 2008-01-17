@@ -20,78 +20,125 @@ import transaction
 
 from urllib2 import HTTPError
 
-from Testing.ZopeTestCase import ZopeTestCase
 from Testing.ZopeTestCase import user_name, user_password
 from Testing.ZopeTestCase import FunctionalTestCase
 
 from Products.Five.testbrowser import Browser
 
+from Products.CMFCore.utils import getToolByName
+
 from collective.rope.tests.testfolder import FOLDER_ID
-from collective.rope.tests.layer import Rope
+from collective.rope.tests.layer import RopePloneSite
 from collective.rope.tests.layer import setupDatabase 
 from collective.rope.tests.layer import DB_UTILITY_NAME
-from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
+from collective.rope.tests.layer import AT_CONTENT_MAPPER
 from collective.rope.tests.folder import manage_addRopeFolder
 from collective.rope.tests.simpleitem import manage_addRopeSimpleItem
 
+from Products.PloneTestCase.PloneTestCase import PloneTestCase
+from Products.PloneTestCase.setup import setupPloneSite
+
 ITEM_KEY = 'first'
 ITEM_ID = '%s_rf' % ITEM_KEY
-ITEM_TITLE = 'First Rope Simple'
+ITEM_TITLE = 'First Rope ATContent'
 ITEM_VIEW = '%s (%s)' % (ITEM_ID, ITEM_TITLE)
 
-class SimpleItemBaseTests(ZopeTestCase):
-    layer = Rope
+setupPloneSite(extension_profiles=['collective.rope.tests:ropeonat'])
+
+class ATContentBaseTests(PloneTestCase):
+    layer = RopePloneSite
 
     def afterSetUp(self):
         setupDatabase()
+        self.setRoles(['Manager'])
+        self.tt = getToolByName(self.portal, 'portal_types')
+        self.wt = getToolByName(self.portal, 'portal_workflow')
+        self.tt.constructContent('Folder', self.portal, 'folder')
+        self.folder = self.portal.folder
         manage_addRopeFolder(self.folder,
-            FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
+            FOLDER_ID, DB_UTILITY_NAME, AT_CONTENT_MAPPER)
         self.rope = getattr(self.folder, FOLDER_ID)
 
-class SimpleItemTests(SimpleItemBaseTests):
+class ATContentTests(ATContentBaseTests):
 
-    def testInstantiateSimpleItem(self):
+    def testInstantiate(self):
         rope = self.rope
-        manage_addRopeSimpleItem(rope, ITEM_ID)
+        self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None, 
+            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
         self.failUnless(ITEM_ID in rope.objectIds())
         item = getattr(rope, ITEM_ID)
         self.assertEquals(ITEM_KEY, item.key)
         self.assertEquals(ITEM_ID, item.getId())
+    
+    def testUID(self):
+        rope = self.rope
+        self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None, 
+            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+        item = getattr(rope, ITEM_ID)
+        uid = item.UID()
+        self.failUnless(uid in item.reference_url())
 
     def testDeleteSimpleItem(self):
         rope = self.rope
-        manage_addRopeSimpleItem(rope, ITEM_ID)
+        self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None, 
+            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
         rope.manage_delObjects([ITEM_ID])
         self.failIf(rope.objectIds())
 
     def testFolderGetAttr(self):
         rope = self.rope
-        manage_addRopeSimpleItem(rope, ITEM_ID)
+        self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None, 
+            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
         item = getattr(rope, ITEM_ID)
         self.assertEquals(ITEM_KEY, item.key)
         self.assertEquals(ITEM_ID, item.getId())
 
     def testFolderUnrestrictedTraverse(self):
         rope = self.rope
-        manage_addRopeSimpleItem(rope, ITEM_ID)
+        self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None, 
+            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
         item = rope.unrestrictedTraverse(ITEM_ID)
         self.assertEquals(ITEM_KEY, item.key)
         self.assertEquals(ITEM_ID, item.getId())
 
-class SimpleItemTestsWithCommits(SimpleItemBaseTests):
+    def testInitialState(self):
+        rope = self.rope
+        self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None, 
+            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+        item = getattr(rope, ITEM_ID)
+        state = self.wt.getInfoFor(item, 'review_state')
+        self.assertEquals(state, 'private') 
+        transitions = [action['transition']
+            for action in self.wt.listActions(object=item)
+            if action['category'] == 'workflow']
+        transitionIds = [transition.id for transition in transitions]
+        transitionIds.sort()
+        self.assertEquals(transitionIds, ['publish', 'submit']) 
+
+    def testWorkflowTransition(self):
+        rope = self.rope
+        self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None, 
+            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+        item = getattr(rope, ITEM_ID)
+        state = self.wt.doActionFor(item, 'publish')
+        state = self.wt.getInfoFor(item, 'review_state')
+        self.assertEquals(state, 'published') 
+
+class ATContentTestsWithCommits(ATContentBaseTests):
     
     def beforeTearDown(self):
         transaction.abort()
         folderid = self.folder.getId()
-        if folderid in self.app.objectIds():
+        if folderid in self.portal.objectIds():
             rope = self.rope
             rope.manage_delObjects(rope.objectIds())
-            self.app.manage_delObjects([folderid])
+            self.portal.manage_delObjects([folderid])
             transaction.commit()
 
     def testDeleteSimpleItemWithCommits(self):
         rope = self.rope
-        manage_addRopeSimpleItem(rope, ITEM_ID)
+        self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None, 
+            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
         transaction.commit()
         rope.manage_delObjects([ITEM_ID])
         transaction.commit()
@@ -99,12 +146,13 @@ class SimpleItemTestsWithCommits(SimpleItemBaseTests):
 
     def testInstantiateSimpleItemWithCommit(self):
         rope = self.rope
-        manage_addRopeSimpleItem(rope, ITEM_ID)
+        self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None, 
+            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
         transaction.commit()
         self.failUnless(ITEM_ID in rope.objectIds())
 
 class ItemBrowserTests(FunctionalTestCase):
-    layer = Rope
+    layer = RopePloneSite
 
     def afterSetUp(self):
         setupDatabase()
@@ -112,11 +160,13 @@ class ItemBrowserTests(FunctionalTestCase):
         self.browser = Browser()
         self.browser.handleErrors = False
         self.browser.addHeader('Authorization', 'Basic %s:%s'%(user_name, user_password))
-        self.folder_path = 'http://localhost/' + self.folder.absolute_url(1)
+        self.tt = getToolByName(self.portal, 'portal_types')
+        self.tt.constructContent('Folder', self.portal, 'folder')
+        self.folder = self.portal.folder
         manage_addRopeFolder(self.folder,
-            FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
+            FOLDER_ID, DB_UTILITY_NAME, AT_CONTENT_MAPPER)
         self.rope = getattr(self.folder, FOLDER_ID)
-        self.item_path = self.folder_path + '/%s/%s' % (FOLDER_ID, ITEM_ID)
+        self.rope_path = 'http://localhost/' + self.rope.absolute_url(1)
 
     def testAdd(self):
         browser = self.browser
@@ -195,12 +245,11 @@ class ItemBrowserTests(FunctionalTestCase):
         # give Owner local role to other
         browser = self.browser
         browser.open(self.item_path + '/manage_listLocalRoles')
-        form = browser.getForm(index=1)
-        ctl = form.getControl(name='roles:list')
+        ctl = browser.getControl(name='roles:list')
         ctl.value = ['Manager']
-        ctl = form.getControl(name='userid')
+        ctl = browser.getControl(name='userid')
         ctl.value = ['other']
-        form.getControl(name='submit').click()
+        browser.getControl(name='submit').click()
         # other can access properties page
         other.open(self.item_path + '/manage_workspace')
         self.assertEquals('200 OK', other.headers['status'])
@@ -216,8 +265,8 @@ class ItemBrowserTests(FunctionalTestCase):
 
 def test_suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(SimpleItemTests))
-    suite.addTest(unittest.makeSuite(SimpleItemTestsWithCommits))
-    suite.addTest(unittest.makeSuite(ItemBrowserTests))
+    suite.addTest(unittest.makeSuite(ATContentTests))
+    suite.addTest(unittest.makeSuite(ATContentTestsWithCommits))
+#    suite.addTest(unittest.makeSuite(ItemBrowserTests))
     return suite
 

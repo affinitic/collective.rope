@@ -160,7 +160,7 @@ class BaseFolder(Folder):
                 raise AttributeError, id
             return default
 
-    def _setObject(self, id, ob):
+    def _setOb(self, id, ob):
         self.__addObjectToSA__(ob)
 
     def _delObject(self, id, dp=1, suppress_events=False):
