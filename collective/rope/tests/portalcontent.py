@@ -56,14 +56,6 @@ class RopePortalContent(BasePortalContent,
     def Title(self):
         return self.title
 
-    def getId(self):
-        return IKeyIdSubobjectSupport(self).makeIdFromKey(self.key)
-
-    def __setId(self, id):
-        self.key = IKeyIdSubobjectSupport(self).makeKeyFromId(id)
-
-    id = property(getId, __setId)
-
 InitializeClass(RopePortalContent)
 
 manage_addPortalContentForm = DTMLFile('simpleAdd', globals())

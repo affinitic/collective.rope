@@ -24,6 +24,7 @@ from AccessControl.Role import RoleManager
 from zope.interface import implements
 
 from interfaces import IStoredInRDB
+from interfaces import IKeyIdSubobjectSupport
 
 _marker = object()
 
@@ -40,11 +41,13 @@ class BaseSimpleItem(object,
 
     implements(IStoredInRDB)
     
-    def __setId(self, id):
-        raise NotImplementedError
-
     def getId(self):
-        raise NotImplementedError
+        return IKeyIdSubobjectSupport(self).makeIdFromKey(self.key)
+
+    def __setId(self, id):
+        self.key = IKeyIdSubobjectSupport(self).makeKeyFromId(id)
+
+    id = property(getId, __setId)
 
     __name__ = property(getId, __setId, None, 'Access to id') 
     

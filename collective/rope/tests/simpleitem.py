@@ -56,14 +56,6 @@ class RopeSimpleItem(BaseSimpleItem, PropertyManager):
         '''call'''
         return '%s (%s)' % (self.id, self.title)
 
-    def getId(self):
-        return IKeyIdSubobjectSupport(self).makeIdFromKey(self.key)
-
-    def __setId(self, id):
-        self.key = IKeyIdSubobjectSupport(self).makeKeyFromId(id)
-
-    id = property(getId, __setId)
-
 InitializeClass(RopeSimpleItem)
 
 manage_addRopeSimpleItemForm = DTMLFile('simpleAdd', globals())

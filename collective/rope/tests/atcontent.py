@@ -48,14 +48,6 @@ class RopeATContent(BaseContentMixin,
     def __init__(self, oid, **kwargs):
         BaseContentMixin.__init__(self, oid, **kwargs)
 
-    def getId(self):
-        return IKeyIdSubobjectSupport(self).makeIdFromKey(self.key)
-
-    def __setId(self, id):
-        self.key = IKeyIdSubobjectSupport(self).makeKeyFromId(id)
-
-    id = property(getId, __setId)
-
 InitializeClass(RopeATContent)
 
 def _RopeATFactory(id, dbUtilityName, mapperName, title=''):
