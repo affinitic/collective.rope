@@ -5,8 +5,15 @@ from Products.Archetypes.interfaces import IReferenceable
 from Products.Archetypes.interfaces.base import IBaseContent as z2IBaseContent
 from Products.Archetypes.interfaces.referenceable import IReferenceable as z2IReferenceable
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
+from Products.Archetypes import PloneMessageFactory as _
+from Products.Archetypes.Schema import Schema
+from Products.Archetypes.Field import StringField
+from Products.Archetypes.Widget import IdWidget
+
 
 from AccessControl import ClassSecurityInfo
+from AccessControl.Permissions import copy_or_move as permission_copy_or_move
+
 from Globals import InitializeClass
 from OFS.History import Historical
 from Products.CMFCore import permissions
@@ -24,6 +31,28 @@ class BaseContentMixin(BasePortalContent,
                        Historical):
     """A not-so-basic CMF Content implementation that doesn't
     include Dublin Core Metadata"""
+
+
+    schema = Schema((
+
+    StringField(
+        name='id',
+        required=0, # Still actually required, but the widget will
+                    # supply the missing value on non-submits
+        mode='rw',
+        permission=permission_copy_or_move,
+        accessor='getId',
+        mutator='setId',
+        default=None,
+        widget=IdWidget(
+            label=_(u'label_short_name', default=u'Short Name'),
+            description=_(u'help_shortname',
+                          default=u'Should not contain spaces, underscores or mixed case. '
+                                   'Short Name is part of the item\'s web address.'),
+            visible={'view' : 'invisible'}
+        ),
+    ),
+    ))
 
     __implements__ = z2IBaseContent, z2IReferenceable, BasePortalContent.__implements__
     implements(IBaseContent, IReferenceable)
