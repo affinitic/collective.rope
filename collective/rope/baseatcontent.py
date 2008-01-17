@@ -28,6 +28,9 @@ class ReferenceBag(dict):
     def _delObject(self, rID):
         del self[rID]
 
+# begin
+# copy from Archetypes.BaseContent 
+
 class BaseContentMixin(BasePortalContent,
                        BaseObject,
                        CatalogMultiplex,
@@ -80,4 +83,7 @@ class BaseContentMixin(BasePortalContent,
 InitializeClass(BaseContentMixin)
 
 __all__ = ('BaseContentMixin', )
+
+# end
+# copy from Archetypes.BaseContent 
 

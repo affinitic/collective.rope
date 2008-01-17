@@ -42,6 +42,9 @@ class BasePortalContent(BaseSimpleItem, DynamicType, CMFCatalogAware):
         interfaces/DublinCore.py.
     """
 
+# begin
+# copy from CMFCore.PortalContent
+
     implements(IContentish)
     __implements__ = (z2IContentish, z2IWriteLock, DynamicType.__implements__)
 
@@ -110,3 +113,6 @@ class BasePortalContent(BaseSimpleItem, DynamicType, CMFCatalogAware):
                             '/'.join( self.getPhysicalPath() ) )
 
 InitializeClass(BasePortalContent)
+
+# end
+# copy from CMFCore.PortalContent
