@@ -35,6 +35,3 @@ class IKeyIdSubobjectSupport(Interface):
     def isSubobject(id):
         """tells if an id conforms to the given conversion."""
 
-    def getIdsCursor():
-        """returns cursor that can fetch subobjec ids."""
-

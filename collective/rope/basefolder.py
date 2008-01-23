@@ -63,13 +63,6 @@ class KeyIdSubobjectSupport(object):
         """see interfaces"""
         return id.endswith(self.subobjectSuffix)
 
-    def getIdsCursor(self):
-        """see interfaces"""
-        selectQuery = str(select(
-            [(self.context._mapperClass.c.key+'suffix').label('zope_id')]))
-        cursor = self.context._session.execute(selectQuery, self.subobjectSuffix)
-        return cursor
-
 class BaseFolder(Folder):
     """subobjects stored outside ZODB through SQLAlchemy"""
 
@@ -103,7 +96,9 @@ class BaseFolder(Folder):
                               'objectIds')
     def objectIds(self):
         '''ids'''
-        cursor = IKeyIdSubobjectSupport(self).getIdsCursor()
+        selectQuery = str(select(
+            [self._mapperClass.c.key]))
+        cursor = self._session.execute(selectQuery)
         try:
             rows = cursor.fetchall()
         finally:
@@ -112,7 +107,8 @@ class BaseFolder(Folder):
             # to make it explicit as some database APIs are very picky
             # about such things
             cursor.close()
-        result = [row.zope_id for row in rows]
+        makeIdFromKey = IKeyIdSubobjectSupport(self).makeIdFromKey
+        result = [makeIdFromKey(row.key) for row in rows]
         return result
 
     security.declareProtected(access_contents_information,
