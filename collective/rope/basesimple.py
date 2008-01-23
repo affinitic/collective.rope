@@ -36,7 +36,7 @@ class BaseSimpleItem(object,
     implements(IStoredInRDB)
     
     def getId(self):
-        return IKeyIdSubobjectSupport(self).makeIdFromKey(self.key)
+        return str(IKeyIdSubobjectSupport(self).makeIdFromKey(self.key))
 
     def __setId(self, id):
         self.key = IKeyIdSubobjectSupport(self).makeKeyFromId(id)
