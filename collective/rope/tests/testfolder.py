@@ -69,7 +69,7 @@ class FolderBrowserTests(FunctionalTestCase):
         browser.open(self.folder_path + '/manage_addProduct/collective.rope/folderAdd')
         ctl = browser.getControl(name='id')
         ctl.value = FOLDER_ID
-        ctl = browser.getControl(name='databaseName')
+        ctl = browser.getControl(name='dbUtilityName')
         ctl.value = DB_UTILITY_NAME
         ctl = browser.getControl(name='mapperName')
         ctl.value = SIMPLE_ITEM_MAPPER

@@ -53,6 +53,7 @@ class KeyIdSubobjectSupport(object):
 
     def makeIdFromKey(self, key):
         """see interfaces"""
+        #XXX should support multiple keys
         return key + self.subobjectSuffix
 
     def makeKeyFromId(self, id):
@@ -70,20 +71,28 @@ class BaseFolder(Folder):
 
     implements(IRDBFolder)
 
-    @property
     def _database(self):
-        db = getUtility(IDatabase, self.databaseName)
-        db.session
-        return db
+        try:
+            db = getUtility(IDatabase, self.dbUtilityName)
+            db.session
+            return db
+        except AttributeError:
+            return None
 
     @property
     def _session(self):
-        return self._database.session
+        if self._database():
+            return self._database().session
+        else:
+            raise ValueError, 'mapperName or dbUtilityName not set'
 
     def getMapperClass(self):
         '''mapperClass'''
-        db = self._database
-        return db.mappers[self.mapperName].class_
+        if self._database():
+            db = self._database()
+            return db.mappers[self.mapperName].class_
+        else:
+            return None
 
     @property
     def _mapperClass(self):
@@ -96,20 +105,23 @@ class BaseFolder(Folder):
                               'objectIds')
     def objectIds(self):
         '''ids'''
-        selectQuery = str(select(
-            [self._mapperClass.c.key]))
-        cursor = self._session.execute(selectQuery)
-        try:
-            rows = cursor.fetchall()
-        finally:
-            # While the resources referenced by the ResultProxy will be
-            # closed when the object is garbage collected, it's better
-            # to make it explicit as some database APIs are very picky
-            # about such things
-            cursor.close()
-        makeIdFromKey = IKeyIdSubobjectSupport(self).makeIdFromKey
-        result = [makeIdFromKey(row.key) for row in rows]
-        return result
+        if self._mapperClass:
+            selectQuery = str(select(
+                [self._mapperClass.c.key]))
+            cursor = self._session.execute(selectQuery)
+            try:
+                rows = cursor.fetchall()
+            finally:
+                # While the resources referenced by the ResultProxy will be
+                # closed when the object is garbage collected, it's better
+                # to make it explicit as some database APIs are very picky
+                # about such things
+                cursor.close()
+            makeIdFromKey = IKeyIdSubobjectSupport(self).makeIdFromKey
+            result = [makeIdFromKey(row.key) for row in rows]
+            return result
+        else:
+            return []
 
     security.declareProtected(access_contents_information,
                               'objectItems')
@@ -121,28 +133,33 @@ class BaseFolder(Folder):
                               'objectValues')
     def objectValues(self):
         '''values'''
-        query = self._session.query(self._mapperClass)
-        results = [item.__of__(self) for item in query.all()]
-        logger.log(logging.INFO, 'query all')
-        return results
+        if self._mapperClass:
+            query = self._session.query(self._mapperClass)
+            results = [item.__of__(self) for item in query.all()]
+            logger.log(logging.INFO, 'query all')
+            return results
+        else:
+            return []
 
     def __getattr__(self, path):
         if path == '__conform__':
-            return Folder.__getattr__(self, path)
+            raise AttributeError
         elif IKeyIdSubobjectSupport(self).isSubobject(path):
             return self.__getObjectFromSA__(path)
         else:
-            return Folder.__getattr__(self, path)
+            raise AttributeError
 
     def __getObjectFromSA__(self, path):
-        #XXX should support multiple keys
-        key = IKeyIdSubobjectSupport(self).makeKeyFromId(path)
-        subobject = self._session.get(self._mapperClass, key)
-        if subobject is None:
-            raise ValueError
+        if self._mapperClass:
+            key = IKeyIdSubobjectSupport(self).makeKeyFromId(path)
+            subobject = self._session.get(self._mapperClass, key)
+            if subobject is None:
+                raise ValueError
+            else:
+                result = subobject.__of__(self)
+                return result
         else:
-            result = subobject.__of__(self)
-            return result
+            raise ValueError, 'mapperName or dbUtilityName not set'
 
     def __addObjectToSA__(self, ob):
         self._session.save(ob)

@@ -45,7 +45,7 @@ A Rope Folder allows access to objects stored in a relational database.
     </div>
     </td>
     <td align="left" valign="top">
-    <input type="text" name="databaseName" size="40" />
+    <input type="text" name="dbUtilityName" size="40" />
     </td>
   </tr>
 

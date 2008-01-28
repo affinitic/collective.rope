@@ -9,6 +9,12 @@
       />
 
   <five:registerClass
+      class=".portalfolder.RopePortalFolder"
+      meta_type="Rope Portal Folder"
+      permission="cmf.AddPortalContent"
+      />
+
+  <five:registerClass
       class=".atcontent.RopeATContent"
       meta_type="Rope AT Content"
       permission="cmf.AddPortalContent"
@@ -17,6 +23,11 @@
   <utility
       component=".portalcontent.RopeFactory"
       name="rope.portalcontent"
+      />
+
+  <utility
+      component=".portalfolder.RopePortalFolderFactory"
+      name="rope.portalfolder"
       />
 
   <utility

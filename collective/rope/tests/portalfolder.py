@@ -23,24 +23,13 @@ from Globals import InitializeClass
 
 from OFS.Folder import Folder
 
-from collective.rope.basefolder import BaseFolder
+from zope.component.factory import Factory
+
+from collective.rope.baseportalfolder import BasePortalFolder
 
 manage_addRopeFolderForm = DTMLFile('folderAdd', globals())
 
-def manage_addRopeFolder(dispatcher, id, dbUtilityName, mapperName, title='', REQUEST=None):
-    """Adds a new SAFolder object with id *id*.
-    """
-    id = str(id)
-    ob = RopeFolder(id)
-    ob.title = str(title)
-    ob.dbUtilityName = dbUtilityName
-    ob.mapperName = mapperName
-    dispatcher._setObject(id, ob)
-    ob = dispatcher._getOb(id)
-    if REQUEST is not None:
-        return dispatcher.manage_main(dispatcher, REQUEST, update_menu=1)
-
-class RopeFolder(BaseFolder):
+class RopePortalFolder(BasePortalFolder):
 
     security = ClassSecurityInfo()
     
@@ -53,6 +42,25 @@ class RopeFolder(BaseFolder):
                               'manage_main')
     manage_main = DTMLFile('contents', globals())
 
-    meta_type = 'Rope Folder'
+    meta_type = 'Rope Portal Folder'
 
-InitializeClass(RopeFolder)
+    portal_type = meta_type
+
+InitializeClass(RopePortalFolder)
+
+def manage_addPortalFolder(dispatcher, id, dbUtilityName, mapperName, title='', REQUEST=None):
+    """Adds a new PortalFolder object with id *id*.
+    """
+    _RopePortalFolderFactory(id, dbUtilityName, mapperName, title)
+    if REQUEST is not None:
+        return dispatcher.manage_main(dispatcher, REQUEST, update_menu=1)
+
+def _RopePortalFolderFactory(id, dbUtilityName, mapperName, title=''):
+    ob = RopePortalFolder()
+    ob.id = id
+    ob.title = str(title)
+    ob.dbUtilityName = dbUtilityName    
+    ob.mapperName = mapperName
+    return ob
+
+RopePortalFolderFactory = Factory(_RopePortalFolderFactory)

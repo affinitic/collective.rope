@@ -33,8 +33,7 @@ from collective.rope.interfaces import IKeyIdSubobjectSupport
 
 class RopeATContent(BaseContentMixin,
               PropertyManager):
-    """A not-so-basic CMF Content implementation with Dublin Core
-    Metadata included"""
+    """Tests Rope AT content"""
 
     implements(IBaseContent, IReferenceable)
 
