@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<object name="Rope AT Folder" meta_type="Factory-based Type Information"
+   i18n:domain="cmf_default" xmlns:i18n="http://xml.zope.org/namespaces/i18n">
+ <property name="title" i18n:translate="">Rope AT Folder</property>
+ <property name="content_meta_type">Rope AT Folder</property>
+ <property name="product"></property>
+ <property name="factory">rope.atfolder</property>
+ <property name="immediate_view">metadata_edit_form</property>
+ <property name="global_allow">True</property>
+ <property name="filter_content_types">True</property>
+ <property name="allowed_content_types"/>
+ <property name="allow_discussion">False</property>
+</object>

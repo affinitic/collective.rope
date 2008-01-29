@@ -55,8 +55,8 @@ class ATContentBaseTests(PloneTestCase):
         self.wt = getToolByName(self.portal, 'portal_workflow')
         self.tt.constructContent('Folder', self.portal, 'folder')
         self.folder = self.portal.folder
-        manage_addRopeFolder(self.folder,
-            FOLDER_ID, DB_UTILITY_NAME, AT_CONTENT_MAPPER)
+        self.tt.constructContent('Rope AT Folder', self.folder, FOLDER_ID, None,
+            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
         self.rope = getattr(self.folder, FOLDER_ID)
 
 class ATContentTests(ATContentBaseTests):
