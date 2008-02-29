@@ -27,7 +27,8 @@ from collective.rope.tests.layer import Rope
 from collective.rope.tests.layer import setupDatabase 
 from collective.rope.tests.layer import DB_UTILITY_NAME
 from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
-from collective.rope.tests.folder import manage_addRopeFolder
+
+from collective.rope.folder import manage_addFolder
 
 FOLDER_ID = 'rope'
 
@@ -38,18 +39,18 @@ class FolderTests(ZopeTestCase):
         setupDatabase()
 
     def testInstantiateFolder(self):
-        manage_addRopeFolder(self.folder,
+        manage_addFolder(self.folder,
             FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
         self.failUnless(FOLDER_ID in self.folder.objectIds())
 
     def testDeleteFolder(self):
-        manage_addRopeFolder(self.folder,
+        manage_addFolder(self.folder,
             FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
         self.folder.manage_delObjects([FOLDER_ID])
         self.failIf(FOLDER_ID in self.folder.objectIds())
 
     def testGetObError(self):
-        manage_addRopeFolder(self.folder,
+        manage_addFolder(self.folder,
             FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
         rope = getattr(self.folder, FOLDER_ID)
         self.assertRaises(AttributeError, rope._getOb, 'notfound')
@@ -79,14 +80,14 @@ class FolderBrowserTests(FunctionalTestCase):
         self.assertEquals('Rope Folder', rope.meta_type)
 
     def testViewRopeFolder(self):
-        manage_addRopeFolder(self.folder,
+        manage_addFolder(self.folder,
             FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
         browser = self.browser
         browser.open(self.folder_path + '/%s/manage_main' % FOLDER_ID)
         self.failUnless('Rope Folder' in browser.contents) 
 
     def testDeleteRopeFolder(self):
-        manage_addRopeFolder(self.folder,
+        manage_addFolder(self.folder,
             FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
         browser = self.browser
         browser.open(self.folder_path + '/manage_main')

@@ -13,7 +13,7 @@
 A Rope Folder allows access to objects stored in a relational database.
 </p>
 
-<FORM ACTION="manage_addRopeFolder" METHOD="POST">
+<FORM ACTION="manage_addFolder" METHOD="POST">
 
 <table cellspacing="0" cellpadding="2" border="0">
   <tr>

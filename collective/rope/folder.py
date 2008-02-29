@@ -25,13 +25,13 @@ from OFS.Folder import Folder
 
 from collective.rope.basefolder import BaseFolder
 
-manage_addRopeFolderForm = DTMLFile('folderAdd', globals())
+manage_addFolderForm = DTMLFile('folderAdd', globals())
 
-def manage_addRopeFolder(dispatcher, id, dbUtilityName, mapperName, title='', REQUEST=None):
-    """Adds a new SAFolder object with id *id*.
+def manage_addFolder(dispatcher, id, dbUtilityName, mapperName, title='', REQUEST=None):
+    """Adds a new Folder object with id *id*.
     """
     id = str(id)
-    ob = RopeFolder(id)
+    ob = Folder(id)
     ob.title = str(title)
     ob.dbUtilityName = dbUtilityName
     ob.mapperName = mapperName
@@ -40,7 +40,7 @@ def manage_addRopeFolder(dispatcher, id, dbUtilityName, mapperName, title='', RE
     if REQUEST is not None:
         return dispatcher.manage_main(dispatcher, REQUEST, update_menu=1)
 
-class RopeFolder(BaseFolder):
+class Folder(BaseFolder):
 
     security = ClassSecurityInfo()
     
@@ -55,4 +55,4 @@ class RopeFolder(BaseFolder):
 
     meta_type = 'Rope Folder'
 
-InitializeClass(RopeFolder)
+InitializeClass(Folder)

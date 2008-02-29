@@ -54,11 +54,14 @@ class KeyIdSubobjectSupport(object):
     def makeIdFromKey(self, key):
         """see interfaces"""
         #XXX should support multiple keys
-        return key + self.subobjectSuffix
+        if not key.endswith(self.subobjectSuffix):
+            return key + self.subobjectSuffix
+        return key
 
     def makeKeyFromId(self, id):
         """see interfaces"""
-        return id[:-len(self.subobjectSuffix)]
+        return id
+        #return id[:-len(self.subobjectSuffix)]
 
     def isSubobject(self, id):
         """see interfaces"""

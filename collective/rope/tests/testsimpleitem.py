@@ -31,11 +31,11 @@ from collective.rope.tests.layer import Rope
 from collective.rope.tests.layer import setupDatabase 
 from collective.rope.tests.layer import DB_UTILITY_NAME
 from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
-from collective.rope.tests.folder import manage_addRopeFolder
 from collective.rope.tests.simpleitem import manage_addRopeSimpleItem
+from collective.rope.folder import manage_addFolder
 
-ITEM_KEY = 'first'
-ITEM_ID = '%s_rf' % ITEM_KEY
+ITEM_KEY = 'first_rf'
+ITEM_ID = '%s' % ITEM_KEY
 ITEM_TITLE = 'First Rope Simple'
 ITEM_VIEW = '%s (%s)' % (ITEM_ID, ITEM_TITLE)
 
@@ -44,7 +44,7 @@ class SimpleItemBaseTests(ZopeTestCase):
 
     def afterSetUp(self):
         setupDatabase()
-        manage_addRopeFolder(self.folder,
+        manage_addFolder(self.folder,
             FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
         self.rope = getattr(self.folder, FOLDER_ID)
 
@@ -113,7 +113,7 @@ class ItemBrowserTests(FunctionalTestCase):
         self.browser.handleErrors = False
         self.browser.addHeader('Authorization', 'Basic %s:%s'%(user_name, user_password))
         self.folder_path = 'http://localhost/' + self.folder.absolute_url(1)
-        manage_addRopeFolder(self.folder,
+        manage_addFolder(self.folder,
             FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
         self.rope = getattr(self.folder, FOLDER_ID)
         self.item_path = self.folder_path + '/%s/%s' % (FOLDER_ID, ITEM_ID)

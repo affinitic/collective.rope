@@ -208,6 +208,7 @@ def _setUpRope():
     XMLConfig('configure.zcml', Products.GenericSetup)()
     installPackage('collective.rope')
     testDb = TestDatabase()
+    sm = getSiteManager()
     provideUtility(testDb, name=DB_UTILITY_NAME, provides=IDatabase)
     setupDatabase()
 

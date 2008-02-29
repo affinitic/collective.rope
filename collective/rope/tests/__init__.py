@@ -16,16 +16,9 @@
 # 02111-1307, USA.
 
 import simpleitem
-import folder
 import portalcontent
 
 def initialize(context):
-    context.registerClass(
-        folder.RopeFolder,
-        constructors=(folder.manage_addRopeFolderForm,
-                      folder.manage_addRopeFolder),
-        )
-
     context.registerClass(
         simpleitem.RopeSimpleItem,
         constructors=(simpleitem.manage_addRopeSimpleItemForm,

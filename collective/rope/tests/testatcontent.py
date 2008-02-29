@@ -29,8 +29,8 @@ from collective.rope.tests.layer import AT_CONTENT_MAPPER
 from Products.PloneTestCase.PloneTestCase import PloneTestCase
 from Products.PloneTestCase.setup import setupPloneSite
 
-ITEM_KEY = 'first'
-ITEM_ID = '%s_rf' % ITEM_KEY
+ITEM_KEY = 'first_rf'
+ITEM_ID = '%s' % ITEM_KEY
 ITEM_TITLE = 'First Rope ATContent'
 ITEM_VIEW = '%s (%s)' % (ITEM_ID, ITEM_TITLE)
 

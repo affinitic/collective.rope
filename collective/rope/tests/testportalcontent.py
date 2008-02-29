@@ -30,8 +30,8 @@ from collective.rope.tests.layer import DB_UTILITY_NAME
 from collective.rope.tests.layer import PORTAL_CONTENT_MAPPER
 from collective.rope.tests.setup import setupPortal
 
-ITEM_KEY = 'first'
-ITEM_ID = '%s_rf' % ITEM_KEY
+ITEM_KEY = 'first_rf'
+ITEM_ID = '%s' % ITEM_KEY
 ITEM_TITLE = 'First Rope PortalContent'
 ITEM_VIEW = '%s (%s)' % (ITEM_ID, ITEM_TITLE)
 
