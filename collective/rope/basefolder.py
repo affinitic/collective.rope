@@ -61,7 +61,6 @@ class KeyIdSubobjectSupport(object):
     def makeKeyFromId(self, id):
         """see interfaces"""
         return id
-        #return id[:-len(self.subobjectSuffix)]
 
     def isSubobject(self, id):
         """see interfaces"""
