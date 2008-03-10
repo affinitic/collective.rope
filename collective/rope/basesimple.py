@@ -36,7 +36,11 @@ class BaseSimpleItem(object,
     implements(IStoredInRDB)
     
     def getId(self):
-        return str(IKeyIdSubobjectSupport(self).makeIdFromKey(self.key))
+        key = self.key
+        if key:
+            return str(IKeyIdSubobjectSupport(self).makeIdFromKey(self.key))
+        else:
+            return ''
 
     def __setId(self, id):
         self.key = IKeyIdSubobjectSupport(self).makeKeyFromId(id)
@@ -65,3 +69,6 @@ class BaseSimpleItem(object,
 
     __new__ = object.__new__
 
+    #dirty work around CMF 
+    def opaqueValues(self):
+        return ()
