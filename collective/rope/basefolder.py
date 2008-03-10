@@ -20,6 +20,7 @@ import logging
 from sqlalchemy import select
 
 from AccessControl import ClassSecurityInfo
+from AccessControl import getSecurityManager
 from AccessControl.Permissions import access_contents_information
 
 from Globals import InitializeClass
@@ -27,18 +28,22 @@ from Globals import InitializeClass
 from Acquisition import aq_base
 
 from OFS.Folder import Folder
-from OFS.event import ObjectWillBeRemovedEvent
 
 from zope.component import getUtility
 from zope.interface import implements
-from zope.event import notify
-from zope.app.container.contained import ObjectRemovedEvent
-from zope.app.container.contained import notifyContainerModified
 
 from collective.lead.interfaces import IDatabase
 
 from interfaces import IRDBFolder
 from interfaces import IKeyIdSubobjectSupport
+
+from zope.event import notify
+from zope.app.container.contained import ObjectAddedEvent
+from zope.app.container.contained import ObjectRemovedEvent
+from zope.app.container.contained import notifyContainerModified
+from OFS.event import ObjectWillBeAddedEvent
+from OFS.event import ObjectWillBeRemovedEvent
+import OFS.subscribers
 
 logger = logging.getLogger('Rope basefolder')
 
@@ -151,6 +156,88 @@ class BaseFolder(Folder):
         else:
             raise AttributeError
 
+    def _setObject(self, id, object, roles=None, user=None, set_owner=1,
+                   suppress_events=False):
+        """Set an object into this container.
+
+        Also sends IObjectWillBeAddedEvent and IObjectAddedEvent.
+        """
+        ob = object # better name, keep original function signature
+        v = self._checkId(id)
+        if v is not None:
+            id = v
+        t = getattr(ob, 'meta_type', None)
+
+        # If an object by the given id already exists, remove it.
+        makeKeyFromId = IKeyIdSubobjectSupport(self).makeKeyFromId
+        key = makeKeyFromId(id)
+
+        query = str(select([self._mapperClass.c.key]))
+        cursor = self._session.execute(query)
+        try:
+            rows = cursor.fetchall()
+            if len(rows):
+                self._delObject(id)
+        except:
+            pass
+
+        if not suppress_events:
+            notify(ObjectWillBeAddedEvent(ob, self, id))
+
+        self._setOb(id, ob)
+        ob = self._getOb(id)
+
+        if set_owner:
+            # TODO: eventify manage_fixupOwnershipAfterAdd
+            # This will be called for a copy/clone, or a normal _setObject.
+            ob.manage_fixupOwnershipAfterAdd()
+
+            # Try to give user the local role "Owner", but only if
+            # no local roles have been set on the object yet.
+            if getattr(ob, '__ac_local_roles__', _marker) is None:
+                user = getSecurityManager().getUser()
+                if user is not None:
+                    userid = user.getId()
+                    if userid is not None:
+                        ob.manage_setLocalRoles(userid, ['Owner'])
+
+        if not suppress_events:
+            notify(ObjectAddedEvent(ob, self, id))
+            notifyContainerModified(self)
+
+        OFS.subscribers.compatibilityCall('manage_afterAdd', ob, ob, self)
+
+        return id
+    
+    def _delObject(self, id, dp=1, suppress_events=False):
+        """Delete an object from this container.
+
+        Also sends IObjectWillBeRemovedEvent and IObjectRemovedEvent.
+        """
+        ob = self._getOb(id)
+
+        OFS.subscribers.compatibilityCall('manage_beforeDelete', ob, ob, self)
+
+        if not suppress_events:
+            notify(ObjectWillBeRemovedEvent(ob, self, id))
+
+        self._delOb(id)
+
+        # Indicate to the object that it has been deleted. This is
+        # necessary for object DB mount points. Note that we have to
+        # tolerate failure here because the object being deleted could
+        # be a Broken object, and it is not possible to set attributes
+        # on Broken objects.
+        try:
+            ob._v__object_deleted__ = 1
+        except:
+            pass
+
+        if not suppress_events:
+            notify(ObjectRemovedEvent(ob, self, id))
+            notifyContainerModified(self)
+
+    #database access
     def __getObjectFromSA__(self, path):
         if self._mapperClass:
             key = IKeyIdSubobjectSupport(self).makeKeyFromId(path)
@@ -167,6 +254,8 @@ class BaseFolder(Folder):
         self._session.save(ob)
         self._session.flush([ob])
 
+
+    #object access
     def _getOb(self, id, default=_marker):
         try:
             return self.__getObjectFromSA__(id)
@@ -178,21 +267,13 @@ class BaseFolder(Folder):
     def _setOb(self, id, ob):
         self.__addObjectToSA__(ob)
 
-    def _delObject(self, id, dp=1, suppress_events=False):
+    def _delOb(self, id):
         ob = self._getOb(id)
-        
-        if not suppress_events:
-            notify(ObjectWillBeRemovedEvent(ob, self, id))
-      
         # When it was saved in the session, the object could not be acquisition
         # wrapped. Thus, we need to unwrap it before we delete it from the
         # session.
         mapper = aq_base(ob)
         self._session.delete(mapper)
         self._session.flush([mapper])
-        
-        if not suppress_events:
-            notify(ObjectRemovedEvent(ob, self, id))
-            notifyContainerModified(self)
 
 InitializeClass(BaseFolder)
