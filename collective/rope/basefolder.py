@@ -172,7 +172,7 @@ class BaseFolder(Folder):
         makeKeyFromId = IKeyIdSubobjectSupport(self).makeKeyFromId
         key = makeKeyFromId(id)
 
-        query = str(select([self._mapperClass.c.key]))
+        query = select([self._mapperClass.c.key], self._mapperClass.c.key == key)
         cursor = self._session.execute(query)
         try:
             rows = cursor.fetchall()
