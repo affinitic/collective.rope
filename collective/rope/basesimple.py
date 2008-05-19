@@ -38,9 +38,9 @@ class BaseSimpleItem(object,
     def getId(self):
         key = self.key
         if key:
-            return str(IKeyIdSubobjectSupport(self).makeIdFromKey(self.key))
+            return IKeyIdSubobjectSupport(self).makeIdFromKey(self.key)
         else:
-            return ''
+            return u''
 
     def __setId(self, id):
         self.key = IKeyIdSubobjectSupport(self).makeKeyFromId(id)

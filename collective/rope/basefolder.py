@@ -51,7 +51,7 @@ _marker = object()
 
 class KeyIdSubobjectSupport(object):
 
-    subobjectSuffix = '_rf'
+    subobjectSuffix = u'_rf'
 
     def __init__(self, context):
         self.context = context
@@ -253,7 +253,6 @@ class BaseFolder(Folder):
     def __addObjectToSA__(self, ob):
         self._session.save(ob)
         self._session.flush([ob])
-
 
     #object access
     def _getOb(self, id, default=_marker):

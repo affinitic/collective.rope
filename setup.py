@@ -25,6 +25,7 @@ setup(name='collective.rope',
       install_requires=[
           'setuptools',
           'collective.lead',
+          'collective.rope',
           # -*- Extra requirements: -*-
       ],
       entry_points="""
