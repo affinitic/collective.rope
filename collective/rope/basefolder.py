@@ -208,7 +208,7 @@ class BaseFolder(Folder):
         OFS.subscribers.compatibilityCall('manage_afterAdd', ob, ob, self)
 
         return id
-    
+
     def _delObject(self, id, dp=1, suppress_events=False):
         """Delete an object from this container.
 

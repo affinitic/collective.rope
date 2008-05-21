@@ -43,7 +43,7 @@ def manage_addFolder(dispatcher, id, dbUtilityName, mapperName, title='', REQUES
 class Folder(BaseFolder):
 
     security = ClassSecurityInfo()
-    
+
     manage_options=(
         ({'label':'Contents', 'action':'manage_main',},
          ) + Folder.manage_options[1:]

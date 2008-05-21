@@ -34,4 +34,3 @@ class IKeyIdSubobjectSupport(Interface):
 
     def isSubobject(id):
         """tells if an id conforms to the given conversion."""
-

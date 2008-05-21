@@ -25,7 +25,7 @@ from AccessControl.Owned import Owned
 from AccessControl.Permissions import view as View
 
 from collective.rope.interfaces import IKeyIdSubobjectSupport
-from collective.rope.basesimple import BaseSimpleItem 
+from collective.rope.basesimple import BaseSimpleItem
 
 class RopeSimpleItem(BaseSimpleItem, PropertyManager):
 
@@ -61,7 +61,7 @@ InitializeClass(RopeSimpleItem)
 manage_addRopeSimpleItemForm = DTMLFile('simpleAdd', globals())
 
 def manage_addRopeSimpleItem(dispatcher, id, title='', REQUEST=None):
-    """Adds a new RopeSimple object with id *id*, 
+    """Adds a new RopeSimple object with id *id*,
     connected with database .
     """
     class_ = dispatcher.getMapperClass()
@@ -75,4 +75,3 @@ def manage_addRopeSimpleItem(dispatcher, id, title='', REQUEST=None):
     ob = ob.__of__(dispatcher)
     if REQUEST is not None:
         return dispatcher.manage_main(dispatcher, REQUEST, update_menu=1)
-

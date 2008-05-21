@@ -22,7 +22,7 @@ from Testing.ZopeTestCase import PortalTestCase
 from Products.CMFCore.utils import getToolByName
 
 from collective.rope.tests.layer import RopePortal
-from collective.rope.tests.layer import setupDatabase 
+from collective.rope.tests.layer import setupDatabase
 from collective.rope.tests.layer import DB_UTILITY_NAME
 from collective.rope.tests.layer import PORTAL_CONTENT_MAPPER
 from collective.rope.tests.setup import setupPortal
@@ -63,4 +63,3 @@ def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(PortalFolderTests))
     return suite
-

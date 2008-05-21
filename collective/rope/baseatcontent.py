@@ -23,7 +23,7 @@ from collective.rope.baseportalcontent import BasePortalContent
 from zope.interface import implements
 
 # begin
-# copy from Archetypes.BaseContent 
+# copy from Archetypes.BaseContent
 
 class BaseContentMixin(BasePortalContent,
                        BaseObject,
@@ -101,5 +101,4 @@ InitializeClass(BaseContentMixin)
 __all__ = ('BaseContentMixin', )
 
 # end
-# copy from Archetypes.BaseContent 
-
+# copy from Archetypes.BaseContent

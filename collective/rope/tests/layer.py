@@ -47,14 +47,14 @@ class TestDatabase(Database):
         return sqlalchemy.engine.url.URL(drivername='sqlite',
                 database=":memory:",
                 host="")
-    
+
     @property
     def _engine_properties(self):
         return {"echo":False}
 
     def _setup_tables(self, metadata, tables):
         tables['t_data'] = sqlalchemy.Table('t_data', metadata,
-               sqlalchemy.Column('key', sqlalchemy.TEXT, 
+               sqlalchemy.Column('key', sqlalchemy.TEXT,
                     primary_key=True),
                sqlalchemy.Column('title', sqlalchemy.TEXT),
                sqlalchemy.Column('field1', sqlalchemy.TEXT, index=True),
@@ -111,7 +111,7 @@ class TestDatabase(Database):
         j = sqlalchemy.sql.join(t_data, t_simpleitem)
         from collective.rope.tests.simpleitem import RopeSimpleItem
         mappers[SIMPLE_ITEM_MAPPER] = sqlalchemy.orm.mapper(RopeSimpleItem, j)
-        
+
         t_portalcontent = tables['t_portalcontent']
         j = sqlalchemy.sql.join(t_data, t_portalcontent)
         from collective.rope.tests.portalcontent import RopePortalContent
@@ -241,7 +241,7 @@ class RopePortal(Portal):
     @classmethod
     def setUp(cls):
         _setUpRope()
-    
+
     @classmethod
     def tearDown(cls):
         _tearDownRope()
@@ -250,7 +250,7 @@ class RopePloneSite(PloneSite):
     @classmethod
     def setUp(cls):
         _setUpRope()
-    
+
     @classmethod
     def tearDown(cls):
         _tearDownRope()

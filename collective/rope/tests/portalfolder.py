@@ -32,7 +32,7 @@ manage_addRopeFolderForm = DTMLFile('folderAdd', globals())
 class RopePortalFolder(BasePortalFolder):
 
     security = ClassSecurityInfo()
-    
+
     manage_options=(
         ({'label':'Contents', 'action':'manage_main',},
          ) + Folder.manage_options[1:]
@@ -59,7 +59,7 @@ def _RopePortalFolderFactory(id, dbUtilityName, mapperName, title=''):
     ob = RopePortalFolder()
     ob.id = id
     ob.title = str(title)
-    ob.dbUtilityName = dbUtilityName    
+    ob.dbUtilityName = dbUtilityName
     ob.mapperName = mapperName
     return ob
 

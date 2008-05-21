@@ -18,7 +18,7 @@ class BasePortalFolder(BaseFolder):
     security = ClassSecurityInfo()
 
 # begin
-# copy from CMFCore.PortalFolder 
+# copy from CMFCore.PortalFolder
 
     security.declarePublic('allowedContentTypes')
     def allowedContentTypes( self ):
@@ -118,4 +118,4 @@ class BasePortalFolder(BaseFolder):
         return l
 
 # end
-# copy from CMFCore.PortalFolder 
+# copy from CMFCore.PortalFolder

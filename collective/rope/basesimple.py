@@ -34,7 +34,7 @@ class BaseSimpleItem(object,
                     RoleManager):
 
     implements(IStoredInRDB)
-    
+
     def getId(self):
         key = self.key
         if key:
@@ -47,8 +47,8 @@ class BaseSimpleItem(object,
 
     id = property(getId, __setId)
 
-    __name__ = property(getId, __setId, None, 'Access to id') 
-    
+    __name__ = property(getId, __setId, None, 'Access to id')
+
     def __getattr__(self, key):
         attr = self.__zope_permissions__.get(key, _marker)
         if attr is _marker:
@@ -69,6 +69,6 @@ class BaseSimpleItem(object,
 
     __new__ = object.__new__
 
-    #dirty work around CMF 
+    #dirty work around CMF
     def opaqueValues(self):
         return ()

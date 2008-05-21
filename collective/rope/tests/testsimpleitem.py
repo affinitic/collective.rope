@@ -28,7 +28,7 @@ from Products.Five.testbrowser import Browser
 
 from collective.rope.tests.testfolder import FOLDER_ID
 from collective.rope.tests.layer import Rope
-from collective.rope.tests.layer import setupDatabase 
+from collective.rope.tests.layer import setupDatabase
 from collective.rope.tests.layer import DB_UTILITY_NAME
 from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
 from collective.rope.tests.simpleitem import manage_addRopeSimpleItem
@@ -79,7 +79,7 @@ class SimpleItemTests(SimpleItemBaseTests):
         self.assertEquals(ITEM_ID, item.getId())
 
 class SimpleItemTestsWithCommits(SimpleItemBaseTests):
-    
+
     def beforeTearDown(self):
         transaction.abort()
         folderid = self.folder.getId()
@@ -124,7 +124,7 @@ class ItemBrowserTests(FunctionalTestCase):
         ctl = browser.getControl(name='id')
         ctl.value = ITEM_ID
         browser.getControl(name="submit").click()
-        self.failUnless(ITEM_ID in self.rope.objectIds()) 
+        self.failUnless(ITEM_ID in self.rope.objectIds())
         item = getattr(self.rope, ITEM_ID)
         self.assertEquals('Rope Simple Item', item.meta_type)
 
@@ -136,7 +136,7 @@ class ItemBrowserTests(FunctionalTestCase):
         ctl = browser.getControl(name='title:UTF-8:string')
         ctl.value = ITEM_TITLE
         browser.getControl(name="manage_editProperties:method").click()
-        self.failUnless(ITEM_TITLE in browser.contents) 
+        self.failUnless(ITEM_TITLE in browser.contents)
         browser.open(self.item_path)
         self.assertEquals(browser.contents, ITEM_VIEW)
 
@@ -146,9 +146,9 @@ class ItemBrowserTests(FunctionalTestCase):
         browser = self.browser
         browser.open(self.folder_path + '/%s/manage_main' % FOLDER_ID)
         ctl = browser.getControl(name='ids:list')
-        ctl.value = [ITEM_ID] 
+        ctl.value = [ITEM_ID]
         browser.getControl(name='manage_delObjects:method').click()
-        self.failIf(FOLDER_ID in self.rope.objectIds()) 
+        self.failIf(FOLDER_ID in self.rope.objectIds())
 
     def testPermission(self):
         rope = self.rope
@@ -220,4 +220,3 @@ def test_suite():
     suite.addTest(unittest.makeSuite(SimpleItemTestsWithCommits))
     suite.addTest(unittest.makeSuite(ItemBrowserTests))
     return suite
-

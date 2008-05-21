@@ -24,7 +24,7 @@ from Testing.ZopeTestCase import FunctionalTestCase
 from Products.Five.testbrowser import Browser
 
 from collective.rope.tests.layer import Rope
-from collective.rope.tests.layer import setupDatabase 
+from collective.rope.tests.layer import setupDatabase
 from collective.rope.tests.layer import DB_UTILITY_NAME
 from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
 
@@ -75,7 +75,7 @@ class FolderBrowserTests(FunctionalTestCase):
         ctl = browser.getControl(name='mapperName')
         ctl.value = SIMPLE_ITEM_MAPPER
         browser.getControl(name="submit").click()
-        self.failUnless(FOLDER_ID in self.folder.objectIds()) 
+        self.failUnless(FOLDER_ID in self.folder.objectIds())
         rope = getattr(self.folder, FOLDER_ID)
         self.assertEquals('Rope Folder', rope.meta_type)
 
@@ -84,7 +84,7 @@ class FolderBrowserTests(FunctionalTestCase):
             FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
         browser = self.browser
         browser.open(self.folder_path + '/%s/manage_main' % FOLDER_ID)
-        self.failUnless('Rope Folder' in browser.contents) 
+        self.failUnless('Rope Folder' in browser.contents)
 
     def testDeleteRopeFolder(self):
         manage_addFolder(self.folder,
@@ -92,13 +92,12 @@ class FolderBrowserTests(FunctionalTestCase):
         browser = self.browser
         browser.open(self.folder_path + '/manage_main')
         ctl = browser.getControl(name='ids:list')
-        ctl.value = [FOLDER_ID] 
+        ctl.value = [FOLDER_ID]
         browser.getControl(name='manage_delObjects:method').click()
-        self.failIf(FOLDER_ID in self.folder.objectIds()) 
+        self.failIf(FOLDER_ID in self.folder.objectIds())
 
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(FolderTests))
     suite.addTest(unittest.makeSuite(FolderBrowserTests))
     return suite
-

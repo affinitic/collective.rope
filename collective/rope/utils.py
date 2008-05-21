@@ -33,5 +33,3 @@ class ReferenceBag(dict):
 
     def _delObject(self, rID):
         del self[rID]
-
-

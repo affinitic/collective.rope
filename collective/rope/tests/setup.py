@@ -234,4 +234,3 @@ def _optimize():
         return list(self._actions)
     from Products.CMFCore.ActionProviderBase import ActionProviderBase
     ActionProviderBase._cloneActions = _cloneActions
-

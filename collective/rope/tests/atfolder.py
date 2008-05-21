@@ -33,7 +33,7 @@ from Products.Archetypes.interfaces.metadata import IExtensibleMetadata
 from collective.rope.baseatfolder import BaseFolderMixin
 
 # begin
-# copy from Archetypes.BaseFolder 
+# copy from Archetypes.BaseFolder
 
 class RopeATFolder(BaseFolderMixin, ExtensibleMetadata):
     """A not-so-basic Folder implementation, with Dublin Core
@@ -75,7 +75,7 @@ InitializeClass(RopeATFolder)
 RopeATFolderSchema = RopeATFolder.schema
 
 # end
-# copy from Archetypes.BaseFolder 
+# copy from Archetypes.BaseFolder
 
 def manage_addATFolder(dispatcher, id, dbUtilityName, mapperName, title='', REQUEST=None):
     """Adds a new ATFolder object with id *id*.
@@ -87,7 +87,7 @@ def manage_addATFolder(dispatcher, id, dbUtilityName, mapperName, title='', REQU
 def _RopeATFolderFactory(id, dbUtilityName, mapperName, title=''):
     ob = RopeATFolder(id)
     ob.title = str(title)
-    ob.dbUtilityName = dbUtilityName    
+    ob.dbUtilityName = dbUtilityName
     ob.mapperName = mapperName
     return ob
 

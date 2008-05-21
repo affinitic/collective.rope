@@ -23,7 +23,7 @@ from Products.PloneTestCase.setup import setupPloneSite
 from Products.CMFCore.utils import getToolByName
 
 from collective.rope.tests.layer import RopePloneSite
-from collective.rope.tests.layer import setupDatabase 
+from collective.rope.tests.layer import setupDatabase
 from collective.rope.tests.layer import DB_UTILITY_NAME
 from collective.rope.tests.layer import AT_CONTENT_MAPPER
 
@@ -63,4 +63,3 @@ def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(ATFolderTests))
     return suite
-

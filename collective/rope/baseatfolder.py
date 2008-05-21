@@ -38,7 +38,7 @@ from Products.Archetypes.interfaces.referenceable import IReferenceable as z2IRe
 from collective.rope.baseportalfolder import BasePortalFolder
 
 # begin
-# copy from Archetypes.BaseFolder 
+# copy from Archetypes.BaseFolder
 
 class BaseFolderMixin(CatalogMultiplex,
                       BaseObject,
@@ -249,7 +249,7 @@ class BaseFolderMixin(CatalogMultiplex,
 InitializeClass(BaseFolderMixin)
 
 # end
-# copy from Archetypes.BaseFolder 
+# copy from Archetypes.BaseFolder
 
 
 __all__ = ('BaseFolder', 'BaseFolderMixin', 'BaseFolderSchema')
