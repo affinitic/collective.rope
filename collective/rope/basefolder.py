@@ -49,6 +49,7 @@ logger = logging.getLogger('Rope basefolder')
 
 _marker = object()
 
+
 class KeyIdSubobjectSupport(object):
 
     subobjectSuffix = u'_rf'
@@ -71,6 +72,7 @@ class KeyIdSubobjectSupport(object):
         """see interfaces"""
         return id.endswith(self.subobjectSuffix)
 
+
 class BaseFolder(Folder):
     """subobjects stored outside ZODB through SQLAlchemy"""
 
@@ -91,7 +93,7 @@ class BaseFolder(Folder):
         if self._database():
             return self._database().session
         else:
-            raise ValueError, 'mapperName or dbUtilityName not set'
+            raise ValueError('mapperName or dbUtilityName not set')
 
     def getMapperClass(self):
         '''mapperClass'''
@@ -110,6 +112,7 @@ class BaseFolder(Folder):
 
     security.declareProtected(access_contents_information,
                               'objectIds')
+
     def objectIds(self):
         '''ids'''
         if self._mapperClass:
@@ -132,12 +135,14 @@ class BaseFolder(Folder):
 
     security.declareProtected(access_contents_information,
                               'objectItems')
+
     def objectItems(self):
         '''items'''
         return [(str(obj.getId()), obj) for obj in self.objectValues()]
 
     security.declareProtected(access_contents_information,
                               'objectValues')
+
     def objectValues(self):
         '''values'''
         if self._mapperClass:
@@ -147,6 +152,13 @@ class BaseFolder(Folder):
             return results
         else:
             return []
+
+    def __len__(self):
+        if self._mapperClass:
+            query = self._session.query(self._mapperClass)
+            return query.count()
+        else:
+            return 0
 
     def __getattr__(self, path):
         if path == '__conform__':
@@ -172,7 +184,8 @@ class BaseFolder(Folder):
         makeKeyFromId = IKeyIdSubobjectSupport(self).makeKeyFromId
         key = makeKeyFromId(id)
 
-        query = select([self._mapperClass.c.key], self._mapperClass.c.key == key)
+        query = select([self._mapperClass.c.key],
+                self._mapperClass.c.key == key)
         cursor = self._session.execute(query)
         try:
             rows = cursor.fetchall()
@@ -237,8 +250,8 @@ class BaseFolder(Folder):
             notify(ObjectRemovedEvent(ob, self, id))
             notifyContainerModified(self)
 
-    #database access
     def __getObjectFromSA__(self, path):
+        #database access
         if self._mapperClass:
             key = IKeyIdSubobjectSupport(self).makeKeyFromId(path)
             subobject = self._session.get(self._mapperClass, key)
@@ -248,19 +261,19 @@ class BaseFolder(Folder):
                 result = subobject.__of__(self)
                 return result
         else:
-            raise ValueError, 'mapperName or dbUtilityName not set'
+            raise ValueError('mapperName or dbUtilityName not set')
 
     def __addObjectToSA__(self, ob):
         self._session.save(ob)
         self._session.flush([ob])
 
-    #object access
     def _getOb(self, id, default=_marker):
+        #object access
         try:
             return self.__getObjectFromSA__(id)
         except ValueError:
             if default is _marker:
-                raise AttributeError, id
+                raise AttributeError(id)
             return default
 
     def _setOb(self, id, ob):
