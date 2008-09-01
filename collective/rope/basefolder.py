@@ -268,6 +268,10 @@ class BaseFolder(Folder):
         self._session.flush([ob])
 
     def _getOb(self, id, default=_marker):
+        if not IKeyIdSubobjectSupport(self).isSubobject(id):
+            if default is _marker:
+                raise AttributeError(id)
+            return default
         #object access
         try:
             return self.__getObjectFromSA__(id)
