@@ -148,7 +148,6 @@ class BaseFolder(Folder):
         if self._mapperClass:
             query = self._session.query(self._mapperClass)
             results = set(item.__of__(self) for item in query.all())
-            logger.log(logging.INFO, 'query all')
             return results
         else:
             return []
