@@ -147,7 +147,12 @@ class BaseFolder(Folder):
         '''values'''
         if self._mapperClass:
             query = self._session.query(self._mapperClass)
-            results = set(item.__of__(self) for item in query.all())
+            items = query.all()
+            results = set()
+            for item in items:
+                item.__parent__ = self
+                item.__of__(self)
+                set.add(item)
             return results
         else:
             return []
@@ -249,17 +254,15 @@ class BaseFolder(Folder):
             notify(ObjectRemovedEvent(ob, self, id))
             notifyContainerModified(self)
 
-    __cache = []
-
     def __getObjectFromSA__(self, path):
         #database access
         if self._mapperClass:
             key = IKeyIdSubobjectSupport(self).makeKeyFromId(path)
             subobject = self._session.query(self._mapperClass).get(key)
-            self.__cache.append(subobject)
             if subobject is None:
                 raise ValueError
             else:
+                subobject.__parent__ = self
                 result = subobject.__of__(self)
                 return result
         else:
