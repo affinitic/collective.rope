@@ -150,7 +150,9 @@ class BaseFolder(Folder):
             items = query.all()
             results = set()
             for item in items:
-                item.__parent__ = self
+                #XXX would loike to be __parent__
+                #but bad interaction with Five. LocalSiteManager
+                item.ropeFolder = self
                 item.__of__(self)
                 set.add(item)
             return results
@@ -262,7 +264,7 @@ class BaseFolder(Folder):
             if subobject is None:
                 raise ValueError
             else:
-                subobject.__parent__ = self
+                subobject.ropeFolder = self
                 result = subobject.__of__(self)
                 return result
         else:
