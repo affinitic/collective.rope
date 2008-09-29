@@ -18,8 +18,6 @@ import logging
 
 from sqlalchemy import select
 
-from Acquisition import aq_inner
-
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
 from AccessControl.Permissions import access_contents_information
@@ -45,6 +43,8 @@ from zope.app.container.contained import notifyContainerModified
 from OFS.event import ObjectWillBeAddedEvent
 from OFS.event import ObjectWillBeRemovedEvent
 import OFS.subscribers
+
+from collective.rope import utils
 
 logger = logging.getLogger('Rope basefolder')
 
@@ -151,13 +151,7 @@ class BaseFolder(Folder):
             items = query.all()
             results = set()
             for item in items:
-                parent = aq_inner(self)
-                # make sure the parent attribute has an aq chain,
-                #or five.localsitemanager.utils.get_parent becomes confused
-                item.__parent__ = parent
-                item.ropeFolder = self
-                item.__of__(parent)
-                results.add(item)
+                results.add(utils.wrapsetup(item, parent=self))
             return results
         else:
             return []
@@ -267,9 +261,7 @@ class BaseFolder(Folder):
             if subobject is None:
                 raise ValueError
             else:
-                subobject.ropeFolder = self
-                result = subobject.__of__(self)
-                return result
+                return utils.wrapsetup(subobject, parent=self)
         else:
             raise ValueError('mapperName or dbUtilityName not set')
 
