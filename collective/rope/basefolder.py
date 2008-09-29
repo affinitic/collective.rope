@@ -18,6 +18,8 @@ import logging
 
 from sqlalchemy import select
 
+from Acquisition import aq_inner
+
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
 from AccessControl.Permissions import access_contents_information
@@ -149,10 +151,12 @@ class BaseFolder(Folder):
             items = query.all()
             results = set()
             for item in items:
-                #XXX would loike to be __parent__
-                #but bad interaction with Five. LocalSiteManager
+                parent = aq_inner(self)
+                # make sure the parent attribute has an aq chain,
+                #or five.localsitemanager.utils.get_parent becomes confused
+                item.__parent__ = parent
                 item.ropeFolder = self
-                item.__of__(self)
+                item.__of__(parent)
                 results.add(item)
             return results
         else:
