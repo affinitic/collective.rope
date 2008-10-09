@@ -148,6 +148,7 @@ class BaseFolder(Folder):
         '''values'''
         if self._mapperClass:
             query = self._session.query(self._mapperClass)
+            query = query.with_polymorphic('*')
             items = query.all()
             results = set()
             for item in items:
@@ -159,6 +160,7 @@ class BaseFolder(Folder):
     def __len__(self):
         if self._mapperClass:
             query = self._session.query(self._mapperClass)
+            query = query.with_polymorphic('*')
             return query.count()
         else:
             return 0
@@ -257,7 +259,9 @@ class BaseFolder(Folder):
         #database access
         if self._mapperClass:
             key = IKeyIdSubobjectSupport(self).makeKeyFromId(path)
-            subobject = self._session.query(self._mapperClass).get(key)
+            query = self._session.query(self._mapperClass)
+            query = query.with_polymorphic('*')
+            subobject = query.get(key)
             if subobject is None:
                 raise ValueError
             else:
