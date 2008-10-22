@@ -39,6 +39,7 @@ ITEM_ID = '%s' % ITEM_KEY
 ITEM_TITLE = 'First Rope Simple'
 ITEM_VIEW = '%s (%s)' % (ITEM_ID, ITEM_TITLE)
 
+
 class SimpleItemBaseTests(ZopeTestCase):
     layer = Rope
 
@@ -47,6 +48,7 @@ class SimpleItemBaseTests(ZopeTestCase):
         manage_addFolder(self.folder,
             FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
         self.rope = getattr(self.folder, FOLDER_ID)
+
 
 class SimpleItemTests(SimpleItemBaseTests):
 
@@ -78,6 +80,7 @@ class SimpleItemTests(SimpleItemBaseTests):
         self.assertEquals(ITEM_KEY, item.key)
         self.assertEquals(ITEM_ID, item.getId())
 
+
 class SimpleItemTestsWithCommits(SimpleItemBaseTests):
 
     def beforeTearDown(self):
@@ -103,6 +106,7 @@ class SimpleItemTestsWithCommits(SimpleItemBaseTests):
         transaction.commit()
         self.failUnless(ITEM_ID in rope.objectIds())
 
+
 class ItemBrowserTests(FunctionalTestCase):
     layer = Rope
 
@@ -111,7 +115,8 @@ class ItemBrowserTests(FunctionalTestCase):
         self.setRoles(['Manager'])
         self.browser = Browser()
         self.browser.handleErrors = False
-        self.browser.addHeader('Authorization', 'Basic %s:%s'%(user_name, user_password))
+        self.browser.addHeader('Authorization',
+                'Basic %s:%s'%(user_name, user_password))
         self.folder_path = 'http://localhost/' + self.folder.absolute_url(1)
         manage_addFolder(self.folder,
             FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
@@ -120,7 +125,8 @@ class ItemBrowserTests(FunctionalTestCase):
 
     def testAdd(self):
         browser = self.browser
-        browser.open(self.folder_path + '/%s/manage_addProduct/collective.rope/simpleAdd' % FOLDER_ID)
+        browser.open(self.folder_path + \
+                '/%s/manage_addProduct/collective.rope/simpleAdd' % FOLDER_ID)
         ctl = browser.getControl(name='id')
         ctl.value = ITEM_ID
         browser.getControl(name="submit").click()
@@ -162,7 +168,8 @@ class ItemBrowserTests(FunctionalTestCase):
         anonymous.open(self.item_path)
         self.assertEquals('200 OK', anonymous.headers['status'])
         # change security to deny anonymous
-        browser.open(self.item_path + '/manage_permissionForm?permission_to_manage=View')
+        browser.open(self.item_path + \
+                '/manage_permissionForm?permission_to_manage=View')
         ctl = browser.getControl(name='roles:list')
         ctl.value = ['Manager']
         ctl = browser.getControl(name='acquire')
@@ -171,7 +178,8 @@ class ItemBrowserTests(FunctionalTestCase):
         # anonymous cannot access anymore
         self.assertRaises(HTTPError, anonymous.open, self.item_path)
         # store View permission on item instead of acquiring it
-        browser.open(self.item_path + '/manage_permissionForm?permission_to_manage=View')
+        browser.open(self.item_path + \
+                '/manage_permissionForm?permission_to_manage=View')
         ctl = browser.getControl(name='roles:list')
         ctl.value = ['Manager', 'Anonymous']
         ctl = browser.getControl(name='acquire')
@@ -191,7 +199,9 @@ class ItemBrowserTests(FunctionalTestCase):
         other = Browser()
         other.addHeader('Authorization', 'Basic %s:%s'%('other', 'other'))
         # other cannot access properties page
-        self.assertRaises(HTTPError, other.open, self.item_path + '/manage_workspace')
+        self.assertRaises(HTTPError,
+                other.open,
+                self.item_path + '/manage_workspace')
         # give Owner local role to other
         browser = self.browser
         browser.open(self.item_path + '/manage_listLocalRoles')
@@ -212,7 +222,10 @@ class ItemBrowserTests(FunctionalTestCase):
         form = browser.getForm(index=0)
         form.getControl(name='submit').click()
         # other cannot access properties page anymore
-        self.assertRaises(HTTPError, other.open, self.item_path + '/manage_workspace')
+        self.assertRaises(HTTPError,
+                other.open,
+                self.item_path + '/manage_workspace')
+
 
 def test_suite():
     suite = unittest.TestSuite()

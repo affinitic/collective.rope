@@ -28,6 +28,7 @@ from interfaces import IKeyIdSubobjectSupport
 
 _marker = object()
 
+
 class BaseSimpleItem(object,
                     Item,
                     Implicit,
@@ -50,10 +51,13 @@ class BaseSimpleItem(object,
     __name__ = property(getId, __setId, None, 'Access to id')
 
     def __getattr__(self, key):
-        attr = self.__zope_permissions__.get(key, _marker)
-        if attr is _marker:
-            raise AttributeError, key
-        return attr
+        if "__zope_permissions__" in self.__dict__:
+            attr = self.__zope_permissions__.get(key, _marker)
+            if attr is _marker:
+                raise AttributeError(key)
+            return attr
+        else:
+            raise AttributeError(key)
 
     def __setattr__(self, key, value):
         if key.startswith('_') and key.endswith('Permission'):
@@ -69,6 +73,6 @@ class BaseSimpleItem(object,
 
     __new__ = object.__new__
 
-    #dirty work around CMF
     def opaqueValues(self):
+        #dirty work around CMF
         return ()

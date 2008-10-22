@@ -41,7 +41,9 @@ PORTAL_CONTENT_MAPPER = 'm_portalcontent'
 AT_CONTENT_MAPPER = 'm_atcontent'
 DB_UTILITY_NAME='test.database'
 
+
 class TestDatabase(Database):
+
     @property
     def _url(self):
         return sqlalchemy.engine.url.URL(drivername='sqlite',
@@ -50,7 +52,7 @@ class TestDatabase(Database):
 
     @property
     def _engine_properties(self):
-        return {"echo":False}
+        return {"echo": False}
 
     def _setup_tables(self, metadata, tables):
         tables['t_data'] = sqlalchemy.Table('t_data', metadata,
@@ -74,7 +76,8 @@ class TestDatabase(Database):
                sqlalchemy.Column('__zope_permissions__', PickleDict,
                     default=makeDictionary),
                )
-        tables['t_portalcontent'] = sqlalchemy.Table('t_portalcontent', metadata,
+        tables['t_portalcontent'] = sqlalchemy.Table('t_portalcontent',
+               metadata,
                sqlalchemy.Column('key', sqlalchemy.TEXT,
                     sqlalchemy.ForeignKey('t_data.key'),
                     primary_key=True),
@@ -115,7 +118,9 @@ class TestDatabase(Database):
         t_portalcontent = tables['t_portalcontent']
         j = sqlalchemy.sql.join(t_data, t_portalcontent)
         from collective.rope.tests.portalcontent import RopePortalContent
-        mappers[PORTAL_CONTENT_MAPPER] = sqlalchemy.orm.mapper(RopePortalContent, j)
+        mappers[PORTAL_CONTENT_MAPPER] = sqlalchemy.orm.mapper(
+                RopePortalContent,
+                j)
 
         t_atcontent = tables['t_atcontent']
         j = sqlalchemy.sql.join(t_data, t_atcontent)
@@ -124,6 +129,7 @@ class TestDatabase(Database):
 
 
 from zope.testing.cleanup import cleanUp as _cleanUp
+
 
 def cleanUp():
     '''Cleans up the component architecture.'''
@@ -153,6 +159,7 @@ def safe_load_site_wrapper(func):
     '''Wraps func with a temporary loading of entire component
        architecture. Used as a decorator.
     '''
+
     def wrapped_func(*args, **kw):
         safe_load_site()
         value = func(*args, **kw)
@@ -165,6 +172,7 @@ _deferred_cleanup = []
 
 
 class ZCML:
+
     def setUp(cls):
         '''Sets up the CA by loading etc/site.zcml.'''
         safe_load_site()
@@ -175,10 +183,12 @@ class ZCML:
         cleanUp()
     tearDown = classmethod(tearDown)
 
+
 def onsetup(func):
     '''Defers a function call to PloneSite layer setup.
        Used as a decorator.
     '''
+
     def deferred_func(*args, **kw):
         _deferred_setup.append((func, args, kw))
     return deferred_func
@@ -188,6 +198,7 @@ def onteardown(func):
     '''Defers a function call to PloneSite layer tear down.
        Used as a decorator.
     '''
+
     def deferred_func(*args, **kw):
         _deferred_cleanup.append((func, args, kw))
     return deferred_func
@@ -199,7 +210,8 @@ try:
 except ImportError:
     pass
 else:
-    ZCML.__bases__ = (ZopeLite,)
+    ZCML.__bases__ = (ZopeLite, )
+
 
 def _setUpRope():
     XMLConfig('configure.zcml', Products.Five)()
@@ -212,12 +224,15 @@ def _setUpRope():
     provideUtility(testDb, name=DB_UTILITY_NAME, provides=IDatabase)
     setupDatabase()
 
+
 def _tearDownRope():
     sqlalchemy.orm.clear_mappers()
     sm = getSiteManager()
     sm.unregisterUtility(name=DB_UTILITY_NAME, provided=IDatabase)
 
+
 class Rope(ZCML):
+
     @classmethod
     def setUp(cls):
         _setUpRope()
@@ -226,7 +241,9 @@ class Rope(ZCML):
     def tearDown(cls):
         _tearDownRope()
 
+
 class Portal(ZCML):
+
     @classmethod
     def setUp(cls):
         for func, args, kw in _deferred_setup:
@@ -237,7 +254,9 @@ class Portal(ZCML):
         for func, args, kw in _deferred_cleanup:
             func(*args, **kw)
 
+
 class RopePortal(Portal):
+
     @classmethod
     def setUp(cls):
         _setUpRope()
@@ -245,8 +264,10 @@ class RopePortal(Portal):
     @classmethod
     def tearDown(cls):
         _tearDownRope()
+
 
 class RopePloneSite(PloneSite):
+
     @classmethod
     def setUp(cls):
         _setUpRope()
@@ -254,9 +275,11 @@ class RopePloneSite(PloneSite):
     @classmethod
     def tearDown(cls):
         _tearDownRope()
+
 
 def setupDatabase():
     database = getUtility(IDatabase, name=DB_UTILITY_NAME)
-    metadata = database.metadata
+    metadata = sqlalchemy.MetaData(database.engine)
+    database._setup_tables(metadata, {})
     metadata.drop_all()
     metadata.create_all()

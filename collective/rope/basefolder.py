@@ -118,7 +118,7 @@ class BaseFolder(Folder):
         '''ids'''
         if self._mapperClass:
             selectQuery = str(select(
-                [self._mapperClass.c.key]))
+                [self._mapperClass.key]))
             cursor = self._session.execute(selectQuery)
             try:
                 rows = cursor.fetchall()
@@ -189,8 +189,8 @@ class BaseFolder(Folder):
         makeKeyFromId = IKeyIdSubobjectSupport(self).makeKeyFromId
         key = makeKeyFromId(id)
 
-        query = select([self._mapperClass.c.key],
-                self._mapperClass.c.key == key)
+        query = select([self._mapperClass.key],
+                self._mapperClass.key == key)
         cursor = self._session.execute(query)
         try:
             rows = cursor.fetchall()
@@ -270,8 +270,8 @@ class BaseFolder(Folder):
             raise ValueError('mapperName or dbUtilityName not set')
 
     def __addObjectToSA__(self, ob):
-        self._session.save(ob)
-        self._session.flush([ob])
+        self._session.add(ob)
+        #self._session.flush([ob])
 
     def _getOb(self, id, default=_marker):
         if not IKeyIdSubobjectSupport(self).isSubobject(id):
