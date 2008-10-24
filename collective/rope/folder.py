@@ -21,6 +21,8 @@ from AccessControl.Permissions import view_management_screens
 from Globals import DTMLFile
 from Globals import InitializeClass
 
+import ExtensionClass
+
 from OFS.Folder import Folder
 
 from collective.rope.basefolder import BaseFolder
@@ -29,7 +31,9 @@ manage_addFolderForm = DTMLFile('folderAdd', globals())
 
 
 def _my_import(item_class):
-    if type(item_class) == types.ClassType:
+    if type(item_class) in (types.ClassType,
+            types.ObjectType,
+            ExtensionClass.ExtensionClass):
         return item_class
     components = item_class.split('.')
     mod = __import__('.'.join(components[0:-1]))
