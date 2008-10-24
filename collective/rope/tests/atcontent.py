@@ -23,13 +23,12 @@ from OFS.PropertyManager import PropertyManager
 
 from zope.interface import implements
 
-from zope.component import getUtility
 from zope.component.factory import Factory
 
-from collective.lead.interfaces import IDatabase
 
 from collective.rope.baseatcontent import BaseContentMixin
 from collective.rope.interfaces import IKeyIdSubobjectSupport
+
 
 class RopeATContent(BaseContentMixin,
               PropertyManager):
@@ -49,13 +48,12 @@ class RopeATContent(BaseContentMixin,
 
 InitializeClass(RopeATContent)
 
-def _RopeATFactory(id, dbUtilityName, mapperName, title=''):
-    db = getUtility(IDatabase, dbUtilityName)
-    class_ = db.mappers[mapperName].class_
+
+def _RopeATFactory(id, class_, title=''):
     ob = class_(id)
     keySupport = IKeyIdSubobjectSupport(ob)
     if not keySupport.isSubobject(id):
-        raise ValueError, "wrong id"
+        raise ValueError("wrong id")
     ob.id = id
     ob.title = str(title)
     return ob

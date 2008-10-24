@@ -3,7 +3,8 @@ from Products.Archetypes.BaseObject import BaseObject
 from Products.Archetypes.interfaces import IBaseContent
 from Products.Archetypes.interfaces import IReferenceable
 from Products.Archetypes.interfaces.base import IBaseContent as z2IBaseContent
-from Products.Archetypes.interfaces.referenceable import IReferenceable as z2IReferenceable
+from Products.Archetypes.interfaces.referenceable \
+        import IReferenceable as z2IReferenceable
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 from Products.Archetypes import PloneMessageFactory as _
 from Products.Archetypes.Schema import Schema
@@ -22,8 +23,34 @@ from collective.rope.baseportalcontent import BasePortalContent
 
 from zope.interface import implements
 
+
+class KeyIdSubobjectSupport(object):
+
+    subobjectSuffix = '_rf'
+
+    def __init__(self, context):
+        self.context = context
+
+    def makeIdFromKey(self, key):
+        """see interfaces"""
+        #XXX should support multiple keys
+        if not key.endswith(self.subobjectSuffix):
+            return key + self.subobjectSuffix
+        return str(key)
+
+    def makeKeyFromId(self, id):
+        """see interfaces"""
+        return id
+
+    def isSubobject(self, id):
+        """see interfaces"""
+        return id.endswith(self.subobjectSuffix)
+
+
+
 # begin
 # copy from Archetypes.BaseContent
+
 
 class BaseContentMixin(BasePortalContent,
                        BaseObject,
@@ -47,32 +74,38 @@ class BaseContentMixin(BasePortalContent,
         widget=IdWidget(
             label=_(u'label_short_name', default=u'Short Name'),
             description=_(u'help_shortname',
-                          default=u'Should not contain spaces, underscores or mixed case. '
-                                   'Short Name is part of the item\'s web address.'),
-            visible={'view' : 'invisible'}
-        ),
+                          default=u'Should not contain spaces, underscores or '
+                                   'mixed case. Short Name is part of the '
+                                   'item\' s web address.'),
+            visible={'view': 'invisible'}),
     ),
     ))
 
-    __implements__ = z2IBaseContent, z2IReferenceable, BasePortalContent.__implements__
+    __implements__ = z2IBaseContent, \
+            z2IReferenceable, \
+            BasePortalContent.__implements__
     implements(IBaseContent, IReferenceable)
 
     security = ClassSecurityInfo()
-    manage_options = BasePortalContent.manage_options + Historical.manage_options
+    manage_options = BasePortalContent.manage_options + \
+            Historical.manage_options
 
     isPrincipiaFolderish = 0
     isAnObjectManager = 0
     __dav_marshall__ = True
 
     security.declarePrivate('manage_afterAdd')
+
     def manage_afterAdd(self, item, container):
         BaseObject.manage_afterAdd(self, item, container)
 
     security.declarePrivate('manage_afterClone')
+
     def manage_afterClone(self, item):
         BaseObject.manage_afterClone(self, item)
 
     security.declarePrivate('manage_beforeDelete')
+
     def manage_beforeDelete(self, item, container):
         BaseObject.manage_beforeDelete(self, item, container)
         #and reset the rename flag (set in Referenceable._notifyCopyOfCopyTo)

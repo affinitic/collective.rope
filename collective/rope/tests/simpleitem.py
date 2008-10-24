@@ -27,11 +27,12 @@ from AccessControl.Permissions import view as View
 from collective.rope.interfaces import IKeyIdSubobjectSupport
 from collective.rope.basesimple import BaseSimpleItem
 
+
 class RopeSimpleItem(BaseSimpleItem, PropertyManager):
 
     security = ClassSecurityInfo()
 
-    _properties = ({'id':'title', 'type': 'string'},
+    _properties = ({'id': 'title', 'type': 'string'},
                   )
     manage_workspace = PropertyManager.manage_propertiesForm
 
@@ -39,19 +40,21 @@ class RopeSimpleItem(BaseSimpleItem, PropertyManager):
         + Owned.manage_options
         + ({'label': 'Interfaces',
            'action': 'manage_interfaces'},
-        {'label':'Security',
-         'action':'manage_access',
-         'help':('OFSP', 'Security.stx')},
+        {'label': 'Security',
+         'action': 'manage_access',
+         'help': ('OFSP', 'Security.stx')},
         )
         )
 
     meta_type = 'Rope Simple Item'
 
     security.declareProtected(View, 'setTitle')
+
     def setTitle(self, title):
         self.title = title
 
     security.declareProtected(View, 'index_html')
+
     def index_html(self):
         '''call'''
         return '%s (%s)' % (self.id, self.title)
@@ -59,6 +62,7 @@ class RopeSimpleItem(BaseSimpleItem, PropertyManager):
 InitializeClass(RopeSimpleItem)
 
 manage_addRopeSimpleItemForm = DTMLFile('simpleAdd', globals())
+
 
 def manage_addRopeSimpleItem(dispatcher, id, title='', REQUEST=None):
     """Adds a new RopeSimple object with id *id*,
@@ -68,7 +72,7 @@ def manage_addRopeSimpleItem(dispatcher, id, title='', REQUEST=None):
     ob = class_()
     keySupport = IKeyIdSubobjectSupport(ob)
     if not keySupport.isSubobject(id):
-        raise ValueError, "wrong id"
+        raise ValueError("wrong id")
     ob.id = id
     ob.title = str(title)
     dispatcher._setObject(id, ob)

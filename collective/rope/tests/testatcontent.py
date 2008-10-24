@@ -22,8 +22,6 @@ from Products.CMFCore.utils import getToolByName
 
 from collective.rope.tests.testfolder import FOLDER_ID
 from collective.rope.tests.layer import RopePloneSite
-from collective.rope.tests.layer import setupDatabase
-from collective.rope.tests.layer import DB_UTILITY_NAME
 from collective.rope.tests.layer import AT_CONTENT_MAPPER
 
 from Products.PloneTestCase.PloneTestCase import PloneTestCase
@@ -36,26 +34,30 @@ ITEM_VIEW = '%s (%s)' % (ITEM_ID, ITEM_TITLE)
 
 setupPloneSite(extension_profiles=['collective.rope.tests:ropeonat'])
 
+
 class ATContentBaseTests(PloneTestCase):
     layer = RopePloneSite
 
     def afterSetUp(self):
-        setupDatabase()
         self.setRoles(['Manager'])
         self.tt = getToolByName(self.portal, 'portal_types')
         self.wt = getToolByName(self.portal, 'portal_workflow')
         self.tt.constructContent('Folder', self.portal, 'folder')
         self.folder = self.portal.folder
-        self.tt.constructContent('Rope AT Folder', self.folder, FOLDER_ID, None,
-            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+        self.tt.constructContent('Rope AT Folder',
+                self.folder,
+                FOLDER_ID,
+                None,
+                itemClass=AT_CONTENT_MAPPER)
         self.rope = getattr(self.folder, FOLDER_ID)
+
 
 class ATContentTests(ATContentBaseTests):
 
     def testInstantiate(self):
         rope = self.rope
         self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None,
-            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+            class_=rope.getMapperClass())
         self.failUnless(ITEM_ID in rope.objectIds())
         item = getattr(rope, ITEM_ID)
         self.assertEquals(ITEM_KEY, item.key)
@@ -64,7 +66,7 @@ class ATContentTests(ATContentBaseTests):
     def testUID(self):
         rope = self.rope
         self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None,
-            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+            class_=rope.getMapperClass())
         item = getattr(rope, ITEM_ID)
         uid = item.UID()
         self.failUnless(uid in item.reference_url())
@@ -72,14 +74,14 @@ class ATContentTests(ATContentBaseTests):
     def testDeleteSimpleItem(self):
         rope = self.rope
         self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None,
-            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+            class_=rope.getMapperClass())
         rope.manage_delObjects([ITEM_ID])
         self.failIf(rope.objectIds())
 
     def testFolderGetAttr(self):
         rope = self.rope
         self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None,
-            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+            class_=rope.getMapperClass())
         item = getattr(rope, ITEM_ID)
         self.assertEquals(ITEM_KEY, item.key)
         self.assertEquals(ITEM_ID, item.getId())
@@ -87,7 +89,7 @@ class ATContentTests(ATContentBaseTests):
     def testFolderUnrestrictedTraverse(self):
         rope = self.rope
         self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None,
-            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+            class_=rope.getMapperClass())
         item = rope.unrestrictedTraverse(ITEM_ID)
         self.assertEquals(ITEM_KEY, item.key)
         self.assertEquals(ITEM_ID, item.getId())
@@ -95,7 +97,7 @@ class ATContentTests(ATContentBaseTests):
     def testInitialState(self):
         rope = self.rope
         self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None,
-            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+            class_=rope.getMapperClass())
         item = getattr(rope, ITEM_ID)
         state = self.wt.getInfoFor(item, 'review_state')
         self.assertEquals(state, 'private')
@@ -109,11 +111,12 @@ class ATContentTests(ATContentBaseTests):
     def testWorkflowTransition(self):
         rope = self.rope
         self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None,
-            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+            class_=rope.getMapperClass())
         item = getattr(rope, ITEM_ID)
         state = self.wt.doActionFor(item, 'publish')
         state = self.wt.getInfoFor(item, 'review_state')
         self.assertEquals(state, 'published')
+
 
 class ATContentTestsWithCommits(ATContentBaseTests):
 
@@ -129,7 +132,7 @@ class ATContentTestsWithCommits(ATContentBaseTests):
     def testDeleteSimpleItemWithCommits(self):
         rope = self.rope
         self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None,
-            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+            class_=rope.getMapperClass())
         transaction.commit()
         rope.manage_delObjects([ITEM_ID])
         transaction.commit()
@@ -138,9 +141,10 @@ class ATContentTestsWithCommits(ATContentBaseTests):
     def testInstantiateSimpleItemWithCommit(self):
         rope = self.rope
         self.tt.constructContent('Rope AT Content', rope, ITEM_ID, None,
-            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+            class_=rope.getMapperClass())
         transaction.commit()
         self.failUnless(ITEM_ID in rope.objectIds())
+
 
 def test_suite():
     suite = unittest.TestSuite()

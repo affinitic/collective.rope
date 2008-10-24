@@ -24,7 +24,7 @@ setup(name='collective.rope',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'collective.lead',
+          'z3c.saconfig',
           # -*- Extra requirements: -*-
       ],
       entry_points="""

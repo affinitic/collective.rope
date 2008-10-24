@@ -16,12 +16,19 @@
 # 02111-1307, USA.
 
 from zope.interface import Interface
+from zope.interface import Attribute
+
 
 class IStoredInRDB(Interface):
     """Zope 2 compliant objects stored in RDB only"""
 
+
 class IRDBFolder(Interface):
     """Zope 2 compliant folder that contains only objects stored in RDB"""
+    item_class = Attribute("Item Class")
+
+    session_name = Attribute("IScopedSession utility name")
+
 
 class IKeyIdSubobjectSupport(Interface):
     """Id to Key support"""

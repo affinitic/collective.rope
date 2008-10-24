@@ -35,6 +35,7 @@ from collective.rope.baseatfolder import BaseFolderMixin
 # begin
 # copy from Archetypes.BaseFolder
 
+
 class RopeATFolder(BaseFolderMixin, ExtensibleMetadata):
     """A not-so-basic Folder implementation, with Dublin Core
     Metadata included"""
@@ -58,6 +59,7 @@ class RopeATFolder(BaseFolderMixin, ExtensibleMetadata):
 
     security.declareProtected(permissions.View,
                               'Description')
+
     def Description(self, **kwargs):
         """We have to override Description here to handle arbitrary
         arguments since PortalFolder defines it."""
@@ -65,6 +67,7 @@ class RopeATFolder(BaseFolderMixin, ExtensibleMetadata):
 
     security.declareProtected(permissions.ModifyPortalContent,
                               'setDescription')
+
     def setDescription(self, value, **kwargs):
         """We have to override setDescription here to handle arbitrary
         arguments since PortalFolder defines it."""
@@ -76,19 +79,36 @@ RopeATFolderSchema = RopeATFolder.schema
 
 # end
 # copy from Archetypes.BaseFolder
+import types
 
-def manage_addATFolder(dispatcher, id, dbUtilityName, mapperName, title='', REQUEST=None):
+
+def _my_import(item_class):
+    if type(item_class) == types.ClassType:
+        return item_class
+    components = item_class.split('.')
+    mod = __import__('.'.join(components[0:-1]))
+    for comp in components[1:]:
+        mod = getattr(mod, comp)
+    return mod
+
+
+def manage_addAttFolder(dispatcher, id,
+        itemClass,
+        sessionName='',
+        title='',
+        REQUEST=None):
     """Adds a new ATFolder object with id *id*.
     """
-    _RopeATFolderFactory(id, dbUtilityName, mapperName, title)
+    _RopeATFolderFactory(id, itemClass, sessionName, title)
     if REQUEST is not None:
         return dispatcher.manage_main(dispatcher, REQUEST, update_menu=1)
 
-def _RopeATFolderFactory(id, dbUtilityName, mapperName, title=''):
+
+def _RopeATFolderFactory(id, itemClass, sessionName='', title=''):
     ob = RopeATFolder(id)
     ob.title = str(title)
-    ob.dbUtilityName = dbUtilityName
-    ob.mapperName = mapperName
+    ob.item_class = _my_import(itemClass)
+    ob.session_name = sessionName
     return ob
 
 RopeATFolderFactory = Factory(_RopeATFolderFactory)

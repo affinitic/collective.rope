@@ -29,14 +29,14 @@ from collective.rope.baseportalfolder import BasePortalFolder
 
 manage_addRopeFolderForm = DTMLFile('folderAdd', globals())
 
+
 class RopePortalFolder(BasePortalFolder):
 
     security = ClassSecurityInfo()
 
     manage_options=(
-        ({'label':'Contents', 'action':'manage_main',},
-         ) + Folder.manage_options[1:]
-        )
+        ({'label': 'Contents', 'action': 'manage_main'}, )
+        + Folder.manage_options[1:])
 
     security.declareProtected(view_management_screens,
                               'manage_main')
@@ -48,19 +48,38 @@ class RopePortalFolder(BasePortalFolder):
 
 InitializeClass(RopePortalFolder)
 
-def manage_addPortalFolder(dispatcher, id, dbUtilityName, mapperName, title='', REQUEST=None):
+import types
+
+
+def _my_import(item_class):
+    if type(item_class) == types.ClassType:
+        return item_class
+    components = item_class.split('.')
+    mod = __import__('.'.join(components[0:-1]))
+    for comp in components[1:]:
+        mod = getattr(mod, comp)
+    return mod
+
+
+def manage_addPortalFolder(dispatcher,
+        id,
+        itemClass,
+        sessionName='',
+        title='',
+        REQUEST=None):
     """Adds a new PortalFolder object with id *id*.
     """
-    _RopePortalFolderFactory(id, dbUtilityName, mapperName, title)
+    _RopePortalFolderFactory(id, itemClass, sessionName, title)
     if REQUEST is not None:
         return dispatcher.manage_main(dispatcher, REQUEST, update_menu=1)
 
-def _RopePortalFolderFactory(id, dbUtilityName, mapperName, title=''):
+
+def _RopePortalFolderFactory(id, itemClass, sessionName='', title=''):
     ob = RopePortalFolder()
     ob.id = id
     ob.title = str(title)
-    ob.dbUtilityName = dbUtilityName
-    ob.mapperName = mapperName
+    ob.item_class = _my_import(itemClass)
+    ob.session_name = sessionName
     return ob
 
 RopePortalFolderFactory = Factory(_RopePortalFolderFactory)

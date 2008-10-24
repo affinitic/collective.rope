@@ -4,7 +4,6 @@
 
     <five:registerPackage package="collective.rope" initialize=".initialize" />
  
-    <include package="collective.lead" />
     <include package=".tests" />
 
 </configure>

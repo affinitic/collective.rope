@@ -28,8 +28,6 @@ from Products.Five.testbrowser import Browser
 
 from collective.rope.tests.testfolder import FOLDER_ID
 from collective.rope.tests.layer import Rope
-from collective.rope.tests.layer import setupDatabase
-from collective.rope.tests.layer import DB_UTILITY_NAME
 from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
 from collective.rope.tests.simpleitem import manage_addRopeSimpleItem
 from collective.rope.folder import manage_addFolder
@@ -44,9 +42,8 @@ class SimpleItemBaseTests(ZopeTestCase):
     layer = Rope
 
     def afterSetUp(self):
-        setupDatabase()
         manage_addFolder(self.folder,
-            FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
+            FOLDER_ID, SIMPLE_ITEM_MAPPER)
         self.rope = getattr(self.folder, FOLDER_ID)
 
 
@@ -111,7 +108,6 @@ class ItemBrowserTests(FunctionalTestCase):
     layer = Rope
 
     def afterSetUp(self):
-        setupDatabase()
         self.setRoles(['Manager'])
         self.browser = Browser()
         self.browser.handleErrors = False
@@ -119,7 +115,7 @@ class ItemBrowserTests(FunctionalTestCase):
                 'Basic %s:%s'%(user_name, user_password))
         self.folder_path = 'http://localhost/' + self.folder.absolute_url(1)
         manage_addFolder(self.folder,
-            FOLDER_ID, DB_UTILITY_NAME, SIMPLE_ITEM_MAPPER)
+            FOLDER_ID, SIMPLE_ITEM_MAPPER)
         self.rope = getattr(self.folder, FOLDER_ID)
         self.item_path = self.folder_path + '/%s/%s' % (FOLDER_ID, ITEM_ID)
 
@@ -161,12 +157,14 @@ class ItemBrowserTests(FunctionalTestCase):
         manage_addRopeSimpleItem(rope, ITEM_ID)
         browser = self.browser
         browser.open(self.item_path)
-        self.assertEquals('200 OK', browser.headers['status'])
+        self.assertEquals('200 OK'.lower(),
+                browser.headers['status'].lower())
         # browser used by 'anonymous'
         anonymous = Browser()
         # anonymous can access
         anonymous.open(self.item_path)
-        self.assertEquals('200 OK', anonymous.headers['status'])
+        self.assertEquals('200 OK'.lower(),
+                anonymous.headers['status'].lower())
         # change security to deny anonymous
         browser.open(self.item_path + \
                 '/manage_permissionForm?permission_to_manage=View')
@@ -188,7 +186,8 @@ class ItemBrowserTests(FunctionalTestCase):
         # anonymous can access again
         anonymous = Browser()
         anonymous.open(self.item_path)
-        self.assertEquals('200 OK', anonymous.headers['status'])
+        self.assertEquals('200 OK'.lower(),
+                anonymous.headers['status'].lower())
 
     def testLocalRole(self):
         uf = self.app.acl_users
@@ -213,7 +212,8 @@ class ItemBrowserTests(FunctionalTestCase):
         form.getControl(name='submit').click()
         # other can access properties page
         other.open(self.item_path + '/manage_workspace')
-        self.assertEquals('200 OK', other.headers['status'])
+        self.assertEquals('200 OK'.lower(),
+                other.headers['status'].lower())
         # remove local role
         browser = self.browser
         browser.open(self.item_path + '/manage_listLocalRoles')

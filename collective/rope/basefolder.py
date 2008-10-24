@@ -28,10 +28,9 @@ from Acquisition import aq_base
 
 from OFS.Folder import Folder
 
-from zope.component import getUtility
 from zope.interface import implements
 
-from collective.lead.interfaces import IDatabase
+from z3c.saconfig import named_scoped_session as Session
 
 from interfaces import IRDBFolder
 from interfaces import IKeyIdSubobjectSupport
@@ -79,34 +78,20 @@ class BaseFolder(Folder):
 
     security = ClassSecurityInfo()
 
+    _v_session = None
+
     implements(IRDBFolder)
 
-    def _database(self):
-        try:
-            db = getUtility(IDatabase, self.dbUtilityName)
-            db.session
-            return db
-        except AttributeError:
-            return None
-
     @property
-    def _session(self):
-        if self._database():
-            return self._database().session
-        else:
-            raise ValueError('mapperName or dbUtilityName not set')
+    def saSession(self):
+        return Session(self.session_name or '')
+        if self._v_session is None:
+            self._v_session = Session(self.session_name or '')
+        return self._v_session
 
     def getMapperClass(self):
         '''mapperClass'''
-        if self._database():
-            db = self._database()
-            return db.mappers[self.mapperName].class_
-        else:
-            return None
-
-    @property
-    def _mapperClass(self):
-        return self.getMapperClass()
+        return self.item_class
 
     def _checkId(self, id, allow_dup=0):
         pass
@@ -116,20 +101,13 @@ class BaseFolder(Folder):
 
     def objectIds(self):
         '''ids'''
-        if self._mapperClass:
+        if self.item_class:
+            session = self.saSession
             selectQuery = str(select(
-                [self._mapperClass.key]))
-            cursor = self._session.execute(selectQuery)
-            try:
-                rows = cursor.fetchall()
-            finally:
-                # While the resources referenced by the ResultProxy will be
-                # closed when the object is garbage collected, it's better
-                # to make it explicit as some database APIs are very picky
-                # about such things
-                cursor.close()
+                [self.item_class.key]))
             makeIdFromKey = IKeyIdSubobjectSupport(self).makeIdFromKey
-            result = [makeIdFromKey(row.key) for row in rows]
+            result = [makeIdFromKey(row.key) for row in
+                    session.execute(selectQuery)]
             return result
         else:
             return []
@@ -146,8 +124,8 @@ class BaseFolder(Folder):
 
     def objectValues(self):
         '''values'''
-        if self._mapperClass:
-            query = self._session.query(self._mapperClass)
+        if self.item_class:
+            query = self.saSession.query(self.item_class)
             query = query.with_polymorphic('*')
             items = query.all()
             results = set()
@@ -158,8 +136,8 @@ class BaseFolder(Folder):
             return []
 
     def __len__(self):
-        if self._mapperClass:
-            query = self._session.query(self._mapperClass)
+        if self.item_class:
+            query = self.saSession.query(self.item_class)
             query = query.with_polymorphic('*')
             return query.count()
         else:
@@ -189,9 +167,9 @@ class BaseFolder(Folder):
         makeKeyFromId = IKeyIdSubobjectSupport(self).makeKeyFromId
         key = makeKeyFromId(id)
 
-        query = select([self._mapperClass.key],
-                self._mapperClass.key == key)
-        cursor = self._session.execute(query)
+        query = select([self.item_class.key],
+                self.item_class.key == key)
+        cursor = self.saSession.execute(query)
         try:
             rows = cursor.fetchall()
             if len(rows):
@@ -257,9 +235,9 @@ class BaseFolder(Folder):
 
     def __getObjectFromSA__(self, path):
         #database access
-        if self._mapperClass:
+        if self.item_class:
             key = IKeyIdSubobjectSupport(self).makeKeyFromId(path)
-            query = self._session.query(self._mapperClass)
+            query = self.saSession.query(self.item_class)
             query = query.with_polymorphic('*')
             subobject = query.get(key)
             if subobject is None:
@@ -267,11 +245,10 @@ class BaseFolder(Folder):
             else:
                 return utils.wrapsetup(subobject, parent=self)
         else:
-            raise ValueError('mapperName or dbUtilityName not set')
+            raise ValueError('mapperName not set')
 
     def __addObjectToSA__(self, ob):
-        self._session.add(ob)
-        #self._session.flush([ob])
+        self.saSession.add(ob)
 
     def _getOb(self, id, default=_marker):
         if not IKeyIdSubobjectSupport(self).isSubobject(id):
@@ -295,7 +272,7 @@ class BaseFolder(Folder):
         # wrapped. Thus, we need to unwrap it before we delete it from the
         # session.
         mapper = aq_base(ob)
-        self._session.delete(mapper)
-        self._session.flush([mapper])
+        self.saSession.delete(mapper)
+        self.saSession.flush([mapper])
 
 InitializeClass(BaseFolder)

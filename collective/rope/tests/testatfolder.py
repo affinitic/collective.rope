@@ -23,19 +23,17 @@ from Products.PloneTestCase.setup import setupPloneSite
 from Products.CMFCore.utils import getToolByName
 
 from collective.rope.tests.layer import RopePloneSite
-from collective.rope.tests.layer import setupDatabase
-from collective.rope.tests.layer import DB_UTILITY_NAME
 from collective.rope.tests.layer import AT_CONTENT_MAPPER
 
 FOLDER_ID = 'rope'
 
 setupPloneSite(extension_profiles=['collective.rope.tests:ropeonat'])
 
+
 class ATFolderTests(PloneTestCase):
     layer = RopePloneSite
 
     def afterSetUp(self):
-        setupDatabase()
         self.setRoles(['Manager'])
         self.tt = getToolByName(self.portal, 'portal_types')
         self.wt = getToolByName(self.portal, 'portal_workflow')
@@ -43,21 +41,30 @@ class ATFolderTests(PloneTestCase):
         self.folder = self.portal.folder
 
     def testInstantiateFolder(self):
-        self.tt.constructContent('Rope AT Folder', self.folder, FOLDER_ID, None,
-            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+        self.tt.constructContent('Rope AT Folder',
+                self.folder,
+                FOLDER_ID,
+                itemClass=AT_CONTENT_MAPPER)
         self.failUnless(FOLDER_ID in self.folder.objectIds())
 
     def testDeleteFolder(self):
-        self.tt.constructContent('Rope AT Folder', self.folder, FOLDER_ID, None,
-            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+        self.tt.constructContent('Rope AT Folder',
+                self.folder,
+                FOLDER_ID,
+                None,
+                itemClass=AT_CONTENT_MAPPER)
         self.folder.manage_delObjects([FOLDER_ID])
         self.failIf(FOLDER_ID in self.folder.objectIds())
 
     def testGetObError(self):
-        self.tt.constructContent('Rope AT Folder', self.folder, FOLDER_ID, None,
-            dbUtilityName=DB_UTILITY_NAME, mapperName=AT_CONTENT_MAPPER)
+        self.tt.constructContent('Rope AT Folder',
+                self.folder,
+                FOLDER_ID,
+                None,
+                itemClass=AT_CONTENT_MAPPER)
         rope = getattr(self.folder, FOLDER_ID)
         self.assertRaises(AttributeError, rope._getOb, 'notfound')
+
 
 def test_suite():
     suite = unittest.TestSuite()

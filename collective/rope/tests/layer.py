@@ -14,6 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
+from cStringIO import StringIO
 
 import sqlalchemy
 
@@ -22,13 +23,11 @@ from Testing.ZopeTestCase.ZopeLite import installPackage
 import Products.Five
 
 from zope.configuration.xmlconfig import XMLConfig
-from zope.component import provideUtility
-from zope.component import getUtility
+from zope.configuration.xmlconfig import xmlconfig
 from zope.component import getSiteManager
 
-import collective.lead
-from collective.lead import Database
-from collective.lead.interfaces import IDatabase
+
+import z3c.saconfig
 
 from collective.rope.utils import makeDictionary
 from collective.rope.utils import compareDictionary
@@ -36,96 +35,85 @@ from collective.rope.utils import makeReferenceBag
 
 from Products.PloneTestCase.layer import PloneSite
 
-SIMPLE_ITEM_MAPPER = 'm_simpleitem'
-PORTAL_CONTENT_MAPPER = 'm_portalcontent'
-AT_CONTENT_MAPPER = 'm_atcontent'
+SIMPLE_ITEM_MAPPER = 'collective.rope.tests.simpleitem.RopeSimpleItem'
+PORTAL_CONTENT_MAPPER = 'collective.rope.tests.portalcontent.RopePortalContent'
+AT_CONTENT_MAPPER = 'collective.rope.tests.atcontent.RopeATContent'
 DB_UTILITY_NAME='test.database'
 
 
-class TestDatabase(Database):
+def _setup_tables(metadata, tables):
+    tables['t_data'] = sqlalchemy.Table('t_data', metadata,
+           sqlalchemy.Column('key', sqlalchemy.TEXT,
+                primary_key=True),
+           sqlalchemy.Column('title', sqlalchemy.TEXT),
+           sqlalchemy.Column('field1', sqlalchemy.TEXT, index=True),
+           sqlalchemy.Column('field2', sqlalchemy.TEXT, index=True),
+           sqlalchemy.Column('field3', sqlalchemy.TEXT),
+           sqlalchemy.Column('field4', sqlalchemy.TEXT),
+           sqlalchemy.Column('field5', sqlalchemy.TEXT),
+           )
+    PickleDict = sqlalchemy.PickleType(comparator=compareDictionary)
+    tables['t_simpleitem'] = sqlalchemy.Table('t_simpleitem', metadata,
+           sqlalchemy.Column('key', sqlalchemy.TEXT,
+                sqlalchemy.ForeignKey('t_data.key'),
+                primary_key=True),
+           # for Zope
+           sqlalchemy.Column('__roles__', sqlalchemy.PickleType),
+           sqlalchemy.Column('__ac_local_roles__', sqlalchemy.PickleType),
+           sqlalchemy.Column('__zope_permissions__', PickleDict,
+                default=makeDictionary),
+           )
+    tables['t_portalcontent'] = sqlalchemy.Table('t_portalcontent',
+           metadata,
+           sqlalchemy.Column('key', sqlalchemy.TEXT,
+                sqlalchemy.ForeignKey('t_data.key'),
+                primary_key=True),
+           # for Zope
+           sqlalchemy.Column('__roles__', sqlalchemy.PickleType),
+           sqlalchemy.Column('__ac_local_roles__', sqlalchemy.PickleType),
+           sqlalchemy.Column('__zope_permissions__', PickleDict,
+                default=makeDictionary),
+           # for DCWorkflow
+           sqlalchemy.Column('workflow_history', PickleDict,
+                default=makeDictionary),
+           )
+    tables['t_atcontent'] = sqlalchemy.Table('t_atcontent', metadata,
+           sqlalchemy.Column('key', sqlalchemy.TEXT,
+                sqlalchemy.ForeignKey('t_data.key'),
+                primary_key=True),
+           # for Zope
+           sqlalchemy.Column('__roles__', sqlalchemy.PickleType),
+           sqlalchemy.Column('__ac_local_roles__', sqlalchemy.PickleType),
+           sqlalchemy.Column('__zope_permissions__', PickleDict,
+                default=makeDictionary),
+           # for DCWorkflow
+           sqlalchemy.Column('workflow_history', PickleDict,
+                default=makeDictionary),
+           # for Archetypes
+           sqlalchemy.Column('_at_uid', sqlalchemy.TEXT),
+           sqlalchemy.Column('at_references', sqlalchemy.PickleType,
+                default=makeReferenceBag),
+           )
 
-    @property
-    def _url(self):
-        return sqlalchemy.engine.url.URL(drivername='sqlite',
-                database=":memory:",
-                host="")
 
-    @property
-    def _engine_properties(self):
-        return {"echo": False}
+def _setup_mappers(tables, mappers):
+    t_data = tables['t_data']
+    t_simpleitem = tables['t_simpleitem']
+    j = sqlalchemy.sql.join(t_data, t_simpleitem)
+    from collective.rope.tests.simpleitem import RopeSimpleItem
+    mappers['m_simpleitem'] = sqlalchemy.orm.mapper(RopeSimpleItem, j)
 
-    def _setup_tables(self, metadata, tables):
-        tables['t_data'] = sqlalchemy.Table('t_data', metadata,
-               sqlalchemy.Column('key', sqlalchemy.TEXT,
-                    primary_key=True),
-               sqlalchemy.Column('title', sqlalchemy.TEXT),
-               sqlalchemy.Column('field1', sqlalchemy.TEXT, index=True),
-               sqlalchemy.Column('field2', sqlalchemy.TEXT, index=True),
-               sqlalchemy.Column('field3', sqlalchemy.TEXT),
-               sqlalchemy.Column('field4', sqlalchemy.TEXT),
-               sqlalchemy.Column('field5', sqlalchemy.TEXT),
-               )
-        PickleDict = sqlalchemy.PickleType(comparator=compareDictionary)
-        tables['t_simpleitem'] = sqlalchemy.Table('t_simpleitem', metadata,
-               sqlalchemy.Column('key', sqlalchemy.TEXT,
-                    sqlalchemy.ForeignKey('t_data.key'),
-                    primary_key=True),
-               # for Zope
-               sqlalchemy.Column('__roles__', sqlalchemy.PickleType),
-               sqlalchemy.Column('__ac_local_roles__', sqlalchemy.PickleType),
-               sqlalchemy.Column('__zope_permissions__', PickleDict,
-                    default=makeDictionary),
-               )
-        tables['t_portalcontent'] = sqlalchemy.Table('t_portalcontent',
-               metadata,
-               sqlalchemy.Column('key', sqlalchemy.TEXT,
-                    sqlalchemy.ForeignKey('t_data.key'),
-                    primary_key=True),
-               # for Zope
-               sqlalchemy.Column('__roles__', sqlalchemy.PickleType),
-               sqlalchemy.Column('__ac_local_roles__', sqlalchemy.PickleType),
-               sqlalchemy.Column('__zope_permissions__', PickleDict,
-                    default=makeDictionary),
-               # for DCWorkflow
-               sqlalchemy.Column('workflow_history', PickleDict,
-                    default=makeDictionary),
-               )
-        tables['t_atcontent'] = sqlalchemy.Table('t_atcontent', metadata,
-               sqlalchemy.Column('key', sqlalchemy.TEXT,
-                    sqlalchemy.ForeignKey('t_data.key'),
-                    primary_key=True),
-               # for Zope
-               sqlalchemy.Column('__roles__', sqlalchemy.PickleType),
-               sqlalchemy.Column('__ac_local_roles__', sqlalchemy.PickleType),
-               sqlalchemy.Column('__zope_permissions__', PickleDict,
-                    default=makeDictionary),
-               # for DCWorkflow
-               sqlalchemy.Column('workflow_history', PickleDict,
-                    default=makeDictionary),
-               # for Archetypes
-               sqlalchemy.Column('_at_uid', sqlalchemy.TEXT),
-               sqlalchemy.Column('at_references', sqlalchemy.PickleType,
-                    default=makeReferenceBag),
-               )
+    t_portalcontent = tables['t_portalcontent']
+    j = sqlalchemy.sql.join(t_data, t_portalcontent)
+    from collective.rope.tests.portalcontent import RopePortalContent
+    mappers['m_portalcontent'] = sqlalchemy.orm.mapper(
+            RopePortalContent,
+            j)
 
-    def _setup_mappers(self, tables, mappers):
-        t_data = tables['t_data']
-        t_simpleitem = tables['t_simpleitem']
-        j = sqlalchemy.sql.join(t_data, t_simpleitem)
-        from collective.rope.tests.simpleitem import RopeSimpleItem
-        mappers[SIMPLE_ITEM_MAPPER] = sqlalchemy.orm.mapper(RopeSimpleItem, j)
-
-        t_portalcontent = tables['t_portalcontent']
-        j = sqlalchemy.sql.join(t_data, t_portalcontent)
-        from collective.rope.tests.portalcontent import RopePortalContent
-        mappers[PORTAL_CONTENT_MAPPER] = sqlalchemy.orm.mapper(
-                RopePortalContent,
-                j)
-
-        t_atcontent = tables['t_atcontent']
-        j = sqlalchemy.sql.join(t_data, t_atcontent)
-        from collective.rope.tests.atcontent import RopeATContent
-        mappers[AT_CONTENT_MAPPER] = sqlalchemy.orm.mapper(RopeATContent, j)
+    t_atcontent = tables['t_atcontent']
+    j = sqlalchemy.sql.join(t_data, t_atcontent)
+    from collective.rope.tests.atcontent import RopeATContent
+    mappers['m_atcontent'] = sqlalchemy.orm.mapper(RopeATContent, j)
 
 
 from zope.testing.cleanup import cleanUp as _cleanUp
@@ -215,20 +203,22 @@ else:
 
 def _setUpRope():
     XMLConfig('configure.zcml', Products.Five)()
-    XMLConfig('configure.zcml', collective.lead)()
     XMLConfig('meta.zcml', Products.GenericSetup)()
+    XMLConfig('meta.zcml', z3c.saconfig)()
     XMLConfig('configure.zcml', Products.GenericSetup)()
     installPackage('collective.rope')
-    testDb = TestDatabase()
-    sm = getSiteManager()
-    provideUtility(testDb, name=DB_UTILITY_NAME, provides=IDatabase)
-    setupDatabase()
+    xmlconfig(StringIO("""
+    <configure xmlns="http://namespaces.zope.org/db">
+       <engine name="dummy" url="sqlite:///:file.db"
+               setup="collective.rope.tests.layer.setupDatabase"/>
+       <session name="" engine="dummy" />
+    </configure>
+    """))
 
 
 def _tearDownRope():
     sqlalchemy.orm.clear_mappers()
     sm = getSiteManager()
-    sm.unregisterUtility(name=DB_UTILITY_NAME, provided=IDatabase)
 
 
 class Rope(ZCML):
@@ -277,9 +267,11 @@ class RopePloneSite(PloneSite):
         _tearDownRope()
 
 
-def setupDatabase():
-    database = getUtility(IDatabase, name=DB_UTILITY_NAME)
-    metadata = sqlalchemy.MetaData(database.engine)
-    database._setup_tables(metadata, {})
+def setupDatabase(engine):
+    sqlalchemy.orm.clear_mappers()
+    metadata = sqlalchemy.MetaData(engine)
+    tables = {}
+    _setup_tables(metadata, tables)
+    _setup_mappers(tables, {})
     metadata.drop_all()
     metadata.create_all()

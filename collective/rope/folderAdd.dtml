@@ -41,22 +41,22 @@ A Rope Folder allows access to objects stored in a relational database.
   <tr>
     <td align="left" valign="top">
     <div class="form-optional">
-    Database Utility Name
+    Session Name
     </div>
     </td>
     <td align="left" valign="top">
-    <input type="text" name="dbUtilityName" size="40" />
+    <input type="text" name="sessionName" size="40" />
     </td>
   </tr>
 
   <tr>
     <td align="left" valign="top">
     <div class="form-optional">
-    Mapper Name
+    Item class
     </div>
     </td>
     <td align="left" valign="top">
-    <input type="text" name="mapperName" size="40" />
+    <input type="text" name="itemClass" size="60" />
     </td>
   </tr>
 

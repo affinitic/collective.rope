@@ -14,7 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
-
+import types
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import view_management_screens
 
@@ -27,25 +27,41 @@ from collective.rope.basefolder import BaseFolder
 
 manage_addFolderForm = DTMLFile('folderAdd', globals())
 
-def manage_addFolder(dispatcher, id, dbUtilityName, mapperName, title='', REQUEST=None):
+
+def _my_import(item_class):
+    if type(item_class) == types.ClassType:
+        return item_class
+    components = item_class.split('.')
+    mod = __import__('.'.join(components[0:-1]))
+    for comp in components[1:]:
+        mod = getattr(mod, comp)
+    return mod
+
+
+def manage_addFolder(dispatcher, id,
+        itemClass,
+        sessionName='',
+        title='',
+        REQUEST=None):
     """Adds a new Folder object with id *id*.
     """
     id = str(id)
     ob = Folder(id)
     ob.title = str(title)
-    ob.dbUtilityName = dbUtilityName
-    ob.mapperName = mapperName
+    ob.item_class = _my_import(itemClass)
+    ob.session_name = str(sessionName)
     dispatcher._setObject(id, ob)
     ob = dispatcher._getOb(id)
     if REQUEST is not None:
         return dispatcher.manage_main(dispatcher, REQUEST, update_menu=1)
+
 
 class Folder(BaseFolder):
 
     security = ClassSecurityInfo()
 
     manage_options=(
-        ({'label':'Contents', 'action':'manage_main',},
+        ({'label': 'Contents', 'action': 'manage_main', },
          ) + Folder.manage_options[1:]
         )
 
