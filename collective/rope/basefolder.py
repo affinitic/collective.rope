@@ -84,7 +84,6 @@ class BaseFolder(Folder):
 
     @property
     def saSession(self):
-        return Session(self.session_name or '')
         if self._v_session is None:
             self._v_session = Session(self.session_name or '')
         return self._v_session
