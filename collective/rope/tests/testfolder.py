@@ -28,6 +28,8 @@ from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
 from collective.rope.folder import manage_addFolder
 
 FOLDER_ID = 'rope'
+ITEM_KEY = 'rope_first_rf'
+ITEM_ID = '%s' % ITEM_KEY
 
 
 class FolderTests(ZopeTestCase):
@@ -49,6 +51,36 @@ class FolderTests(ZopeTestCase):
             FOLDER_ID, SIMPLE_ITEM_MAPPER)
         rope = getattr(self.folder, FOLDER_ID)
         self.assertRaises(AttributeError, rope._getOb, 'notfound')
+
+from zope.app.container.tests.test_icontainer import BaseTestIContainer
+
+
+class IContainerTests(ZopeTestCase, BaseTestIContainer):
+    layer = Rope
+
+    def makeTestObject(self):
+        if hasattr(self.folder, FOLDER_ID):
+            self.folder.manage_delObjects([FOLDER_ID])
+        manage_addFolder(self.folder,
+            FOLDER_ID, SIMPLE_ITEM_MAPPER)
+        return getattr(self.folder, FOLDER_ID)
+
+    def makeTestData(self):
+        self.__container = container = self.makeTestObject()
+        class_ = self.__container.getMapperClass()
+        dataSet = []
+        for i in range(0, 10):
+            item_id = u"%s_icontainer_rf"%i
+            ob = class_()
+            ob.id = item_id
+            dataSet.append((item_id, ob))
+        return dataSet
+
+    def getUnknownKey(self):
+        return '10'
+
+    def getBadKeyTypes(self):
+        return [None, ['foo'], 1, '\xf3abc']
 
 
 class FolderBrowserTests(FunctionalTestCase):
@@ -96,5 +128,6 @@ class FolderBrowserTests(FunctionalTestCase):
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(FolderTests))
+    suite.addTest(unittest.makeSuite(IContainerTests))
     suite.addTest(unittest.makeSuite(FolderBrowserTests))
     return suite

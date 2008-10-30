@@ -71,6 +71,12 @@ class KeyIdSubobjectSupport(object):
 
     def isSubobject(self, id):
         """see interfaces"""
+        if id is None:
+            return False
+        try:
+            id = unicode(id)
+        except:
+            return False
         return id.endswith(self.subobjectSuffix)
 
 
@@ -96,34 +102,50 @@ class BaseFolder(Folder):
     def _checkId(self, id, allow_dup=0):
         pass
 
+    def _checkKey(self, name):
+        if not IKeyIdSubobjectSupport(self).isSubobject(name):
+            raise KeyError(name)
+
     # fulfill IContainer interface
 
     def keys(self):
-        # self.session.flush() # flush any outstanding deletions - maybe later
         return self.objectIds()
 
     def values(self):
-        return (self[k] for k in self.keys())
+        return self.objectValues()
 
     def items(self):
-        return ((k, self[k]) for k in self.keys())
+        return self.objectItems()
 
     def get(self, name, default=None):
-        if IKeyIdSubobjectSupport(self).isSubobject(name):
-            return self.__getObjectFromSA__(name, default)
-        return default
+        try:
+            self._checkKey(name)
+            return self.__getObjectFromSA__(name)
+        except KeyError:
+            return default
+        except ValueError:
+            return default
 
     def __getitem__(self, name):
-        if IKeyIdSubobjectSupport(self).isSubobject(name):
+        self._checkKey(name)
+        try:
             return self.__getObjectFromSA__(name)
-        else:
+        except ValueError:
             raise KeyError(name)
 
     def __setitem__(self, name, obj):
+        obj = obj.__of__(self)
+        if name is None or not \
+                IKeyIdSubobjectSupport(self).isSubobject(name):
+            raise TypeError(name)
         self._setOb(name, obj)
 
     def __delitem__(self, name):
-        self._delOb(name)
+        try:
+            self._checkKey(name)
+            self._delOb(name)
+        except AttributeError:
+            raise KeyError(name)
 
     def __contains__(self, name):
         item = self.get(name)
@@ -152,6 +174,7 @@ class BaseFolder(Folder):
         '''ids'''
         if self.item_class:
             session = self.saSession
+            session.flush()
             selectQuery = str(select(
                 [self.item_class.key]))
             makeIdFromKey = IKeyIdSubobjectSupport(self).makeIdFromKey
@@ -177,9 +200,9 @@ class BaseFolder(Folder):
             query = self.saSession.query(self.item_class)
             query = query.with_polymorphic('*')
             items = query.all()
-            results = set()
+            results = []
             for item in items:
-                results.add(utils.wrapsetup(item, parent=self))
+                results.append(utils.wrapsetup(item, parent=self))
             return results
         else:
             return []
