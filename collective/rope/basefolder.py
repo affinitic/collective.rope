@@ -36,6 +36,7 @@ from interfaces import IRDBFolder
 from interfaces import IKeyIdSubobjectSupport
 
 from zope.event import notify
+from zope.app.container.interfaces import IContainer
 from zope.app.container.contained import ObjectAddedEvent
 from zope.app.container.contained import ObjectRemovedEvent
 from zope.app.container.contained import notifyContainerModified
@@ -80,7 +81,7 @@ class BaseFolder(Folder):
 
     _v_session = None
 
-    implements(IRDBFolder)
+    implements(IRDBFolder, IContainer)
 
     @property
     def saSession(self):
@@ -94,6 +95,55 @@ class BaseFolder(Folder):
 
     def _checkId(self, id, allow_dup=0):
         pass
+
+    # fulfill IContainer interface
+
+    def keys(self):
+        # self.session.flush() # flush any outstanding deletions - maybe later
+        return self.objectIds()
+
+    def values(self):
+        return (self[k] for k in self.keys())
+
+    def items(self):
+        return ((k, self[k]) for k in self.keys())
+
+    def get(self, name, default=None):
+        if IKeyIdSubobjectSupport(self).isSubobject(name):
+            return self.__getObjectFromSA__(name, default)
+        return default
+
+    def __getitem__(self, name):
+        if IKeyIdSubobjectSupport(self).isSubobject(name):
+            return self.__getObjectFromSA__(name)
+        else:
+            raise KeyError(name)
+
+    def __setitem__(self, name, obj):
+        self._setOb(name, obj)
+
+    def __delitem__(self, name):
+        self._delOb(name)
+
+    def __contains__(self, name):
+        item = self.get(name)
+        if item is not None:
+            return True
+        else:
+            return False
+
+    def __iter__(self):
+        return self.keys()
+
+    def __len__(self):
+        if self.item_class:
+            query = self.saSession.query(self.item_class)
+            query = query.with_polymorphic('*')
+            return query.count()
+        else:
+            return 0
+
+    # end of IContainer
 
     security.declareProtected(access_contents_information,
                               'objectIds')
@@ -133,14 +183,6 @@ class BaseFolder(Folder):
             return results
         else:
             return []
-
-    def __len__(self):
-        if self.item_class:
-            query = self.saSession.query(self.item_class)
-            query = query.with_polymorphic('*')
-            return query.count()
-        else:
-            return 0
 
     def __getattr__(self, path):
         if path in ('__conform__', '__provides__'):
