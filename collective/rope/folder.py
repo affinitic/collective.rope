@@ -23,8 +23,6 @@ from Globals import InitializeClass
 
 import ExtensionClass
 
-from OFS.Folder import Folder
-
 from collective.rope.basefolder import BaseFolder
 
 manage_addFolderForm = DTMLFile('folderAdd', globals())
@@ -40,6 +38,25 @@ def _my_import(item_class):
     for comp in components[1:]:
         mod = getattr(mod, comp)
     return mod
+
+
+class Folder(BaseFolder):
+
+    security = ClassSecurityInfo()
+    from OFS.Folder import Folder
+    manage_options=(
+        ({'label': 'Contents', 'action': 'manage_main', },
+         ) + Folder.manage_options[1:]
+        )
+
+    security.declareProtected(view_management_screens,
+                              'manage_main')
+    manage_main = DTMLFile('contents', globals())
+
+    meta_type = 'Rope Folder'
+
+
+InitializeClass(Folder)
 
 
 def manage_addFolder(dispatcher, id,
@@ -58,21 +75,3 @@ def manage_addFolder(dispatcher, id,
     ob = dispatcher._getOb(id)
     if REQUEST is not None:
         return dispatcher.manage_main(dispatcher, REQUEST, update_menu=1)
-
-
-class Folder(BaseFolder):
-
-    security = ClassSecurityInfo()
-
-    manage_options=(
-        ({'label': 'Contents', 'action': 'manage_main', },
-         ) + Folder.manage_options[1:]
-        )
-
-    security.declareProtected(view_management_screens,
-                              'manage_main')
-    manage_main = DTMLFile('contents', globals())
-
-    meta_type = 'Rope Folder'
-
-InitializeClass(Folder)

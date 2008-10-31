@@ -208,7 +208,7 @@ class BaseFolder(Folder):
             return []
 
     def __getattr__(self, path):
-        if path in ('__conform__', '__provides__'):
+        if path in ('__conform__', '__provides__', '__parent__'):
             raise AttributeError
         elif IKeyIdSubobjectSupport(self).isSubobject(path):
             return self.__getObjectFromSA__(path)
