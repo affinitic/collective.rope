@@ -49,6 +49,6 @@ def wrapsetup(ob, parent):
     # make sure the parent attribute has an aq chain
     # or five.localsitemanager.utils.get_parent becomes confused
     #XXX seems to doesn't work in every cases
-    ##ob.__parent__ = parent
+    #ob.__parent__ = parent
     ob = ob.__of__(parent)
     return ob

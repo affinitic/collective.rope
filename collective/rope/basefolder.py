@@ -305,7 +305,7 @@ class BaseFolder(Folder):
             query = query.with_polymorphic('*')
             subobject = query.get(key)
             if subobject is None:
-                raise ValueError
+                raise KeyError
             else:
                 return utils.wrapsetup(subobject, parent=self)
         else:
