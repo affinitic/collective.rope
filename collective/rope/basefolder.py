@@ -92,7 +92,7 @@ class BaseFolder(Folder):
     @property
     def saSession(self):
         if self._v_session is None:
-            self._v_session = Session(self.session_name or '')
+            self._v_session = Session(self.session_name or '')()
         return self._v_session
 
     def getMapperClass(self):
@@ -337,6 +337,5 @@ class BaseFolder(Folder):
         # session.
         mapper = aq_base(ob)
         self.saSession.delete(mapper)
-        self.saSession.flush([mapper])
 
 InitializeClass(BaseFolder)
