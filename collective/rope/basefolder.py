@@ -161,6 +161,7 @@ class BaseFolder(Folder):
     def __len__(self):
         if self.item_class:
             query = self.saSession.query(self.item_class)
+            query = query.with_polymorphic('*')
             return query.count()
         else:
             return 0
@@ -198,6 +199,7 @@ class BaseFolder(Folder):
         '''values'''
         if self.item_class:
             query = self.saSession.query(self.item_class)
+            query = query.with_polymorphic('*')
             items = query.all()
             results = []
             for item in items:
