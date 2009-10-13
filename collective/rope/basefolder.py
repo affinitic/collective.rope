@@ -91,6 +91,7 @@ class BaseFolder(Folder):
 
     @property
     def saSession(self):
+        return Session(self.session_name or '')()
         if self._v_session is None:
             self._v_session = Session(self.session_name or '')()
         return self._v_session
@@ -160,7 +161,6 @@ class BaseFolder(Folder):
     def __len__(self):
         if self.item_class:
             query = self.saSession.query(self.item_class)
-            query = query.with_polymorphic('*')
             return query.count()
         else:
             return 0
@@ -198,7 +198,6 @@ class BaseFolder(Folder):
         '''values'''
         if self.item_class:
             query = self.saSession.query(self.item_class)
-            query = query.with_polymorphic('*')
             items = query.all()
             results = []
             for item in items:
