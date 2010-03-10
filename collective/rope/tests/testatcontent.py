@@ -22,20 +22,26 @@ from Products.CMFCore.utils import getToolByName
 
 from collective.rope.tests.testfolder import FOLDER_ID
 from collective.rope.tests.layer import RopePloneSite
+from collective.rope.tests.layer import setup_plone_product
 from collective.rope.tests.layer import AT_CONTENT_MAPPER
 
-from Products.PloneTestCase.PloneTestCase import PloneTestCase
 from Products.PloneTestCase.setup import setupPloneSite
+from Products.PloneTestCase import PloneTestCase
 
 ITEM_KEY = 'first_rf'
 ITEM_ID = '%s' % ITEM_KEY
 ITEM_TITLE = 'First Rope ATContent'
 ITEM_VIEW = '%s (%s)' % (ITEM_ID, ITEM_TITLE)
 
+# The order here is important: We first call the deferred function and then
+# let PloneTestCase install it during Plone site setup
+
+setup_plone_product()
 setupPloneSite(extension_profiles=['collective.rope.tests:ropeonat'])
 
 
-class ATContentBaseTests(PloneTestCase):
+class ATContentBaseTests(PloneTestCase.PloneTestCase):
+
     layer = RopePloneSite
 
     def afterSetUp(self):

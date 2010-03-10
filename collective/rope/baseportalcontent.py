@@ -14,8 +14,8 @@
 from AccessControl import ClassSecurityInfo
 from AccessControl.Owned import Owned
 from Acquisition import aq_base
-from Globals import InitializeClass
-from webdav.WriteLockInterface import WriteLockInterface as z2IWriteLock
+from App.class_init import InitializeClass
+#from webdav.WriteLockInterface import WriteLockInterface as z2IWriteLock
 from zope.interface import implements
 
 from OFS.PropertyManager import PropertyManager
@@ -25,7 +25,7 @@ from Products.CMFCore.DynamicType import DynamicType
 from Products.CMFCore.exceptions import NotFound
 from Products.CMFCore.exceptions import ResourceLockedError
 from Products.CMFCore.interfaces import IContentish
-from Products.CMFCore.interfaces.Contentish import Contentish as z2IContentish
+#from Products.CMFCore.interfaces.Contentish import Contentish as z2IContentish
 from Products.CMFCore.permissions import FTPAccess
 from Products.CMFCore.permissions import View
 from Products.CMFCore.utils import Message as _
@@ -46,7 +46,7 @@ class BasePortalContent(BaseSimpleItem, DynamicType, CMFCatalogAware):
 # copy from CMFCore.PortalContent
 
     implements(IContentish)
-    __implements__ = (z2IContentish, z2IWriteLock, DynamicType.__implements__)
+    #__implements__ = (z2IContentish, z2IWriteLock, DynamicType.__implements__)
 
     manage_options = ( ( { 'label'  : 'Dublin Core'
                          , 'action' : 'manage_metadata'

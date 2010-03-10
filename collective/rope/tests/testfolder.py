@@ -17,12 +17,14 @@
 
 import unittest
 
+from Products.CMFTestCase import CMFTestCase
 from Testing.ZopeTestCase import ZopeTestCase
 from Testing.ZopeTestCase import user_name, user_password
 from Testing.ZopeTestCase import FunctionalTestCase
 
 from Products.Five.testbrowser import Browser
 from collective.rope.tests.layer import Rope
+from collective.rope.tests.layer import setup_cmf_product
 from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
 
 from collective.rope.folder import manage_addFolder
@@ -31,8 +33,14 @@ FOLDER_ID = 'rope'
 ITEM_KEY = 'rope_first_rf'
 ITEM_ID = '%s' % ITEM_KEY
 
+# The order here is important: We first call the deferred function and then
+# let ZopeTestCase install it
+
+setup_cmf_product()
+CMFTestCase.setupCMFSite()
 
 class FolderTests(ZopeTestCase):
+
     layer = Rope
 
     def testInstantiateFolder(self):
@@ -52,7 +60,10 @@ class FolderTests(ZopeTestCase):
         rope = getattr(self.folder, FOLDER_ID)
         self.assertRaises(AttributeError, rope._getOb, 'notfound')
 
-from zope.app.container.tests.test_icontainer import BaseTestIContainer
+try:
+    from zope.app.container.tests.test_icontainer import BaseTestIContainer
+except ImportError:
+    from zope.container.tests.test_icontainer import BaseTestIContainer
 
 
 class IContainerTests(ZopeTestCase, BaseTestIContainer):

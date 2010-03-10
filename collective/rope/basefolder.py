@@ -22,7 +22,7 @@ from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
 from AccessControl.Permissions import access_contents_information
 
-from Globals import InitializeClass
+from App.class_init import InitializeClass
 
 from Acquisition import aq_base
 
@@ -303,7 +303,13 @@ class BaseFolder(Folder):
             key = IKeyIdSubobjectSupport(self).makeKeyFromId(path)
             query = self.saSession.query(self.item_class)
             query = query.with_polymorphic('*')
-            subobject = query.get(key)
+            # TODO subobject = query.get() maybe marginally
+            # more efficient but does not work due to some
+            # obscure sqlalchemy bug: when an object is in the session
+            # and the scalar attributes are unloaded, the attribute
+            # are not reloaded after a get...
+            query = query.filter(self.item_class.key == key)
+            subobject = query.first()
             if subobject is None:
                 raise KeyError
             else:

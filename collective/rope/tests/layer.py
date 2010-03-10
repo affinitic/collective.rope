@@ -21,6 +21,8 @@ import sqlalchemy
 from Testing.ZopeTestCase.ZopeLite import installPackage
 
 import Products.Five
+from Products.Five import zcml
+from Products.Five import fiveconfigure
 
 from zope.configuration.xmlconfig import XMLConfig
 from zope.configuration.xmlconfig import xmlconfig
@@ -28,17 +30,19 @@ from zope.component import getSiteManager
 
 
 import z3c.saconfig
-
+import collective.rope
 from collective.rope.utils import makeDictionary
 from collective.rope.utils import compareDictionary
 from collective.rope.utils import makeReferenceBag
 
+from Products.CMFTestCase.layer import onsetup as cmf_onsetup
+from Products.PloneTestCase.layer import onsetup as plone_onsetup
 from Products.PloneTestCase.layer import PloneSite
 
 SIMPLE_ITEM_MAPPER = 'collective.rope.tests.simpleitem.RopeSimpleItem'
 PORTAL_CONTENT_MAPPER = 'collective.rope.tests.portalcontent.RopePortalContent'
 AT_CONTENT_MAPPER = 'collective.rope.tests.atcontent.RopeATContent'
-DB_UTILITY_NAME='test.database'
+DB_UTILITY_NAME = 'test.database'
 
 
 def _setup_tables(metadata, tables):
@@ -116,97 +120,11 @@ def _setup_mappers(tables, mappers):
     mappers['m_atcontent'] = sqlalchemy.orm.mapper(RopeATContent, j)
 
 
-from zope.testing.cleanup import cleanUp as _cleanUp
-
-
-def cleanUp():
-    '''Cleans up the component architecture.'''
-    _cleanUp()
-    import Products.Five.zcml as zcml
-    zcml._initialized = 0
-
-
-def setDebugMode(mode):
-    '''Allows manual setting of Five's inspection of debug mode
-       to allow for ZCML to fail meaningfully.
-    '''
-    import Products.Five.fiveconfigure as fc
-    fc.debug_mode = mode
-
-
-def safe_load_site():
-    '''Loads entire component architecture (w/ debug mode on).'''
-    cleanUp()
-    setDebugMode(1)
-    import Products.Five.zcml as zcml
-    zcml.load_site()
-    setDebugMode(0)
-
-
-def safe_load_site_wrapper(func):
-    '''Wraps func with a temporary loading of entire component
-       architecture. Used as a decorator.
-    '''
-
-    def wrapped_func(*args, **kw):
-        safe_load_site()
-        value = func(*args, **kw)
-        cleanUp()
-        return value
-    return wrapped_func
-
-_deferred_setup = []
-_deferred_cleanup = []
-
-
-class ZCML:
-
-    def setUp(cls):
-        '''Sets up the CA by loading etc/site.zcml.'''
-        safe_load_site()
-    setUp = classmethod(setUp)
-
-    def tearDown(cls):
-        '''Cleans up the CA.'''
-        cleanUp()
-    tearDown = classmethod(tearDown)
-
-
-def onsetup(func):
-    '''Defers a function call to PloneSite layer setup.
-       Used as a decorator.
-    '''
-
-    def deferred_func(*args, **kw):
-        _deferred_setup.append((func, args, kw))
-    return deferred_func
-
-
-def onteardown(func):
-    '''Defers a function call to PloneSite layer tear down.
-       Used as a decorator.
-    '''
-
-    def deferred_func(*args, **kw):
-        _deferred_cleanup.append((func, args, kw))
-    return deferred_func
-
-
-# Derive from ZopeLite layer if available
-try:
-    from Testing.ZopeTestCase.layer import ZopeLite
-except ImportError:
-    pass
-else:
-    ZCML.__bases__ = (ZopeLite, )
-
-
 def _setUpRope():
     XMLConfig('configure.zcml', Products.Five)()
     XMLConfig('meta.zcml', Products.GenericSetup)()
-    XMLConfig('meta.zcml', z3c.saconfig)()
     XMLConfig('configure.zcml', Products.GenericSetup)()
-    installPackage('collective.rope')
+    XMLConfig('meta.zcml', z3c.saconfig)()
     xmlconfig(StringIO("""
     <configure xmlns="http://namespaces.zope.org/db">
        <engine name="dummy" url="sqlite:///:file.db"
@@ -221,7 +139,33 @@ def _tearDownRope():
     sm = getSiteManager()
 
 
-class Rope(ZCML):
+def setup_product():
+    """Set up additional products and ZCML required to test this product.
+    """
+
+    # Load the ZCML configuration for this package and its dependencies
+
+    fiveconfigure.debug_mode = True
+    zcml.load_config('configure.zcml', collective.rope)
+    fiveconfigure.debug_mode = False
+
+    # We need to tell the testing framework that these products
+    # should be available. This can't happen until after we have loaded
+    # the ZCML.
+
+    installPackage('collective.rope')
+
+# The plone_onsetup decorator causes the execution of this body to be deferred
+# until the setup of the Plone site testing layer.
+setup_plone_product = plone_onsetup(setup_product)
+# The cmf_onsetup decorator causes the execution of this body to be deferred
+# until the setup of the CMF site testing layer.
+setup_cmf_product = cmf_onsetup(setup_product)
+
+from Products.CMFTestCase.layer import CMFSite
+
+
+class Rope(CMFSite):
 
     @classmethod
     def setUp(cls):
@@ -232,17 +176,8 @@ class Rope(ZCML):
         _tearDownRope()
 
 
-class Portal(ZCML):
-
-    @classmethod
-    def setUp(cls):
-        for func, args, kw in _deferred_setup:
-            func(*args, **kw)
-
-    @classmethod
-    def tearDown(cls):
-        for func, args, kw in _deferred_cleanup:
-            func(*args, **kw)
+class Portal(CMFSite):
+    pass
 
 
 class RopePortal(Portal):

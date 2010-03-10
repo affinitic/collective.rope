@@ -19,7 +19,7 @@ from zope.interface import implements
 
 from AccessControl import ClassSecurityInfo
 from AccessControl import Unauthorized
-from Globals import InitializeClass
+from App.class_init import InitializeClass
 
 from Products.CMFCore import permissions
 from Products.CMFCore.interfaces import IContentish
@@ -47,8 +47,8 @@ class BaseFolderMixin(CatalogMultiplex,
     """A not-so-basic Folder implementation, with no Dublin Core
     Metadata"""
 
-    __implements__ = (z2IBaseFolder, z2IReferenceable, BaseObject.__implements__,
-                      BasePortalFolder.__implements__)
+    #__implements__ = (z2IBaseFolder, z2IReferenceable, BaseObject.__implements__,
+    #                  BasePortalFolder.__implements__)
     implements(IBaseFolder, IBaseObject, IReferenceable, IContentish)
 
     security = ClassSecurityInfo()

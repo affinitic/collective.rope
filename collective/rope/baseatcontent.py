@@ -2,9 +2,6 @@ from Products.Archetypes import WebDAVSupport
 from Products.Archetypes.BaseObject import BaseObject
 from Products.Archetypes.interfaces import IBaseContent
 from Products.Archetypes.interfaces import IReferenceable
-from Products.Archetypes.interfaces.base import IBaseContent as z2IBaseContent
-from Products.Archetypes.interfaces.referenceable \
-        import IReferenceable as z2IReferenceable
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 from Products.Archetypes import PloneMessageFactory as _
 from Products.Archetypes.Schema import Schema
@@ -15,7 +12,7 @@ from Products.Archetypes.Widget import IdWidget
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import copy_or_move as permission_copy_or_move
 
-from Globals import InitializeClass
+from App.class_init import InitializeClass
 from OFS.History import Historical
 from Products.CMFCore import permissions
 
@@ -81,9 +78,9 @@ class BaseContentMixin(BasePortalContent,
     ),
     ))
 
-    __implements__ = z2IBaseContent, \
-            z2IReferenceable, \
-            BasePortalContent.__implements__
+    #__implements__ = z2IBaseContent, \
+    #        z2IReferenceable, \
+    #        BasePortalContent.__implements__
     implements(IBaseContent, IReferenceable)
 
     security = ClassSecurityInfo()

@@ -24,8 +24,13 @@ from Products.CMFCore.utils import getToolByName
 
 from collective.rope.tests.layer import RopePloneSite
 from collective.rope.tests.layer import AT_CONTENT_MAPPER
+from collective.rope.tests.layer import setup_plone_product
 
 FOLDER_ID = 'rope'
+# The order here is important: We first call the deferred function and then
+# let PloneTestCase install it during Plone site setup
+
+setup_plone_product()
 
 setupPloneSite(extension_profiles=['collective.rope.tests:ropeonat'])
 

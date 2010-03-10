@@ -18,7 +18,7 @@
 from Products.Archetypes.interfaces import IBaseContent
 from Products.Archetypes.interfaces import IReferenceable
 
-from Globals import InitializeClass
+from App.class_init import InitializeClass
 from OFS.PropertyManager import PropertyManager
 
 from zope.interface import implements

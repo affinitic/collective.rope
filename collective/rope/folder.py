@@ -18,8 +18,8 @@ import types
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import view_management_screens
 
-from Globals import DTMLFile
-from Globals import InitializeClass
+from App.special_dtml import DTMLFile
+from App.class_init import InitializeClass
 
 import ExtensionClass
 

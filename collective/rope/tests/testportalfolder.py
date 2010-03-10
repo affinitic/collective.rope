@@ -17,20 +17,24 @@
 
 import unittest
 
-from Testing.ZopeTestCase import PortalTestCase
-
 from Products.CMFCore.utils import getToolByName
 
 from collective.rope.tests.layer import RopePortal
 from collective.rope.tests.layer import PORTAL_CONTENT_MAPPER
-from collective.rope.tests.setup import setupPortal
+from collective.rope.tests.layer import setup_cmf_product
+from Products.CMFTestCase import CMFTestCase
+from Products.CMFTestCase.setup import setupCMFSite
 
 FOLDER_ID = 'rope'
 
-setupPortal(extension_profiles=['collective.rope.tests:ropeoncmf'])
+# The order here is important: We first call the deferred function and then
+# let PloneTestCase install it during Plone site setup
+
+setup_cmf_product()
+setupCMFSite(extension_profiles=['collective.rope.tests:ropeoncmf'])
 
 
-class PortalFolderTests(PortalTestCase):
+class PortalFolderTests(CMFTestCase.CMFTestCase):
     layer = RopePortal
 
     def afterSetUp(self):
