@@ -32,13 +32,12 @@ from Products.Archetypes.BaseObject import BaseObject
 from Products.Archetypes.interfaces import IBaseFolder
 from Products.Archetypes.interfaces import IBaseObject
 from Products.Archetypes.interfaces import IReferenceable
-from Products.Archetypes.interfaces.base import IBaseFolder as z2IBaseFolder
-from Products.Archetypes.interfaces.referenceable import IReferenceable as z2IReferenceable
 
 from collective.rope.baseportalfolder import BasePortalFolder
 
 # begin
 # copy from Archetypes.BaseFolder
+
 
 class BaseFolderMixin(CatalogMultiplex,
                       BaseObject,
@@ -47,8 +46,6 @@ class BaseFolderMixin(CatalogMultiplex,
     """A not-so-basic Folder implementation, with no Dublin Core
     Metadata"""
 
-    #__implements__ = (z2IBaseFolder, z2IReferenceable, BaseObject.__implements__,
-    #                  BasePortalFolder.__implements__)
     implements(IBaseFolder, IBaseObject, IReferenceable, IContentish)
 
     security = ClassSecurityInfo()
@@ -100,21 +97,24 @@ class BaseFolderMixin(CatalogMultiplex,
         BaseObject._notifyOfCopyTo(self, container, op=op)
         # keep reference info internally when op == 1 (move)
         # because in those cases we need to keep refs
-        if op==1:
+        if op == 1:
             self._v_cp_refs = 1
         for child in self.contentValues():
             if IReferenceable.providedBy(child):
                 child._notifyOfCopyTo(self, op)
 
     security.declarePrivate('manage_afterAdd')
+
     def manage_afterAdd(self, item, container):
         BaseObject.manage_afterAdd(self, item, container)
 
     security.declarePrivate('manage_afterClone')
+
     def manage_afterClone(self, item):
         BaseObject.manage_afterClone(self, item)
 
     security.declarePrivate('manage_beforeDelete')
+
     def manage_beforeDelete(self, item, container):
         BaseObject.manage_beforeDelete(self, item, container)
         #and reset the rename flag (set in Referenceable._notifyCopyOfCopyTo)
@@ -122,6 +122,7 @@ class BaseFolderMixin(CatalogMultiplex,
 
     security.declareProtected(permissions.DeleteObjects,
                               'manage_delObjects')
+
     def manage_delObjects(self, ids=[], REQUEST=None):
         """We need to enforce security."""
         if isinstance(ids, basestring):
@@ -129,24 +130,27 @@ class BaseFolderMixin(CatalogMultiplex,
         for id in ids:
             item = self._getOb(id)
             if not _checkPermission(permissions.DeleteObjects, item):
-                raise Unauthorized, (
-                    "Do not have permissions to remove this object")
+                raise Unauthorized(
+                        "Do not have permissions to remove this object")
         return BasePortalFolder.manage_delObjects(self, ids, REQUEST=REQUEST)
 
     security.declareProtected(permissions.ListFolderContents,
                               'listFolderContents')
+
     def listFolderContents(self, contentFilter=None, suppressHiddenFiles=0):
         """Optionally you can suppress "hidden" files, or files that begin
         with a dot.
         """
-        contents=BasePortalFolder.listFolderContents(self, contentFilter=contentFilter)
+        contents = BasePortalFolder.listFolderContents(self,
+                contentFilter=contentFilter)
         if suppressHiddenFiles:
-            contents=[obj for obj in contents if obj.getId()[:1]!='.']
+            contents = [obj for obj in contents if obj.getId()[:1] != '.']
 
         return contents
 
     security.declareProtected(permissions.AccessContentsInformation,
                               'folderlistingFolderContents')
+
     def folderlistingFolderContents(self, contentFilter=None,
                                     suppressHiddenFiles=0):
         """Calls listFolderContents in protected only by ACI so that
@@ -157,6 +161,7 @@ class BaseFolderMixin(CatalogMultiplex,
                                        suppressHiddenFiles=suppressHiddenFiles)
 
     security.declareProtected(permissions.View, 'Title')
+
     def Title(self, **kwargs):
         """We have to override Title here to handle arbitrary arguments since
         BasePortalFolder defines it."""
@@ -164,6 +169,7 @@ class BaseFolderMixin(CatalogMultiplex,
 
     security.declareProtected(permissions.ModifyPortalContent,
                               'setTitle')
+
     def setTitle(self, value, **kwargs):
         """We have to override setTitle here to handle arbitrary
         arguments since BasePortalFolder defines it."""
@@ -186,6 +192,7 @@ class BaseFolderMixin(CatalogMultiplex,
     # use instead "_at_type_subfolder" or our own type.
     security.declareProtected(permissions.AddPortalFolders,
                               'manage_addFolder')
+
     def manage_addFolder(self,
                          id,
                          title='',
@@ -232,6 +239,7 @@ class BaseFolderMixin(CatalogMultiplex,
         return result
 
     security.declarePrivate('manage_afterMKCOL')
+
     def manage_afterMKCOL(self, id, result, REQUEST=None, RESPONSE=None):
         """After MKCOL handler.
         """

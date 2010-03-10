@@ -39,7 +39,6 @@ class RopeATFolder(BaseFolderMixin, ExtensibleMetadata):
     """A not-so-basic Folder implementation, with Dublin Core
     Metadata included"""
 
-    #__implements__ = BaseFolderMixin.__implements__, IExtensibleMetadata
     implements(IBaseFolder, IBaseObject, IReferenceable, IContentish)
 
     schema = BaseFolderMixin.schema + ExtensibleMetadata.schema

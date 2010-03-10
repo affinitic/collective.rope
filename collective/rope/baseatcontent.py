@@ -78,9 +78,6 @@ class BaseContentMixin(BasePortalContent,
     ),
     ))
 
-    #__implements__ = z2IBaseContent, \
-    #        z2IReferenceable, \
-    #        BasePortalContent.__implements__
     implements(IBaseContent, IReferenceable)
 
     security = ClassSecurityInfo()
@@ -114,7 +111,7 @@ class BaseContentMixin(BasePortalContent,
         BaseObject._notifyOfCopyTo(self, container, op=op)
         # keep reference info internally when op == 1 (move)
         # because in those cases we need to keep refs
-        if op==1:
+        if op == 1:
             self._v_cp_refs = 1
 
     security.declareProtected(permissions.ModifyPortalContent, 'PUT')

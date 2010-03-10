@@ -15,7 +15,6 @@ from AccessControl import ClassSecurityInfo
 from AccessControl.Owned import Owned
 from Acquisition import aq_base
 from App.class_init import InitializeClass
-#from webdav.WriteLockInterface import WriteLockInterface as z2IWriteLock
 from zope.interface import implements
 
 from OFS.PropertyManager import PropertyManager
@@ -25,12 +24,12 @@ from Products.CMFCore.DynamicType import DynamicType
 from Products.CMFCore.exceptions import NotFound
 from Products.CMFCore.exceptions import ResourceLockedError
 from Products.CMFCore.interfaces import IContentish
-#from Products.CMFCore.interfaces.Contentish import Contentish as z2IContentish
 from Products.CMFCore.permissions import FTPAccess
 from Products.CMFCore.permissions import View
 from Products.CMFCore.utils import Message as _
 
 from basesimple import BaseSimpleItem
+
 
 class BasePortalContent(BaseSimpleItem, DynamicType, CMFCatalogAware):
 
@@ -46,26 +45,21 @@ class BasePortalContent(BaseSimpleItem, DynamicType, CMFCatalogAware):
 # copy from CMFCore.PortalContent
 
     implements(IContentish)
-    #__implements__ = (z2IContentish, z2IWriteLock, DynamicType.__implements__)
 
-    manage_options = ( ( { 'label'  : 'Dublin Core'
-                         , 'action' : 'manage_metadata'
-                         }
-                       , { 'label'  : 'Edit'
-                         , 'action' : 'manage_edit'
-                         }
-                       , { 'label'  : 'View'
-                         , 'action' : 'view'
-                         }
-                       )
+    manage_options = (({'label': 'Dublin Core',
+                        'action': 'manage_metadata'},
+                        {'label': 'Edit',
+                         'action': 'manage_edit'},
+                        {'label': 'View',
+                         'action': 'view'})
                      + CMFCatalogAware.manage_options
                      + PropertyManager.manage_options
                      + Owned.manage_options
                      + ({'label': 'Interfaces',
                          'action': 'manage_interfaces'},
-                        {'label':'Security',
-                         'action':'manage_access',
-                         'help':('OFSP', 'Security.stx')},
+                        {'label': 'Security',
+                         'action': 'manage_access',
+                         'help': ('OFSP', 'Security.stx')},
                        )
                      )
 
@@ -90,6 +84,7 @@ class BasePortalContent(BaseSimpleItem, DynamicType, CMFCatalogAware):
     #   Contentish interface methods
     #
     security.declareProtected(View, 'SearchableText')
+
     def SearchableText(self):
         """ Returns a concatination of all searchable text.
 
@@ -102,15 +97,15 @@ class BasePortalContent(BaseSimpleItem, DynamicType, CMFCatalogAware):
         """
         ti = self.getTypeInfo()
         method_id = ti and ti.queryMethodID('(Default)', context=self)
-        if method_id and method_id!='(Default)':
+        if method_id and method_id != '(Default)':
             method = getattr(self, method_id)
             if getattr(aq_base(method), 'isDocTemp', 0):
                 return method(self, self.REQUEST, self.REQUEST['RESPONSE'])
             else:
                 return method()
         else:
-            raise NotFound( 'Cannot find default view for "%s"' %
-                            '/'.join( self.getPhysicalPath() ) )
+            raise NotFound('Cannot find default view for "%s"' %
+                            '/'.join(self.getPhysicalPath()))
 
 InitializeClass(BasePortalContent)
 
