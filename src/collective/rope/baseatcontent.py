@@ -2,9 +2,6 @@ from Products.Archetypes import WebDAVSupport
 from Products.Archetypes.BaseObject import BaseObject
 from Products.Archetypes.interfaces import IBaseContent
 from Products.Archetypes.interfaces import IReferenceable
-from Products.Archetypes.interfaces.base import IBaseContent as z2IBaseContent
-from Products.Archetypes.interfaces.referenceable \
-        import IReferenceable as z2IReferenceable
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 from Products.Archetypes import PloneMessageFactory as _
 from Products.Archetypes.Schema import Schema
@@ -81,9 +78,6 @@ class BaseContentMixin(BasePortalContent,
     ),
     ))
 
-    __implements__ = z2IBaseContent, \
-            z2IReferenceable, \
-            BasePortalContent.__implements__
     implements(IBaseContent, IReferenceable)
 
     security = ClassSecurityInfo()
@@ -117,7 +111,7 @@ class BaseContentMixin(BasePortalContent,
         BaseObject._notifyOfCopyTo(self, container, op=op)
         # keep reference info internally when op == 1 (move)
         # because in those cases we need to keep refs
-        if op==1:
+        if op == 1:
             self._v_cp_refs = 1
 
     security.declareProtected(permissions.ModifyPortalContent, 'PUT')

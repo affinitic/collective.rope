@@ -24,11 +24,11 @@ import Products.Five
 
 from zope.configuration.xmlconfig import XMLConfig
 from zope.configuration.xmlconfig import xmlconfig
-from zope.component import getSiteManager
 
 
 import z3c.saconfig
 
+import collective.rope
 from collective.rope.utils import makeDictionary
 from collective.rope.utils import compareDictionary
 from collective.rope.utils import makeReferenceBag
@@ -38,7 +38,7 @@ from Products.PloneTestCase.layer import PloneSite
 SIMPLE_ITEM_MAPPER = 'collective.rope.tests.simpleitem.RopeSimpleItem'
 PORTAL_CONTENT_MAPPER = 'collective.rope.tests.portalcontent.RopePortalContent'
 AT_CONTENT_MAPPER = 'collective.rope.tests.atcontent.RopeATContent'
-DB_UTILITY_NAME='test.database'
+DB_UTILITY_NAME = 'test.database'
 
 
 def _setup_tables(metadata, tables):
@@ -206,6 +206,7 @@ def _setUpRope():
     XMLConfig('meta.zcml', Products.GenericSetup)()
     XMLConfig('meta.zcml', z3c.saconfig)()
     XMLConfig('configure.zcml', Products.GenericSetup)()
+    XMLConfig('configure.zcml', collective.rope)()
     installPackage('collective.rope')
     xmlconfig(StringIO("""
     <configure xmlns="http://namespaces.zope.org/db">
@@ -218,7 +219,6 @@ def _setUpRope():
 
 def _tearDownRope():
     sqlalchemy.orm.clear_mappers()
-    sm = getSiteManager()
 
 
 class Rope(ZCML):

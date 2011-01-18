@@ -16,8 +16,8 @@
 # 02111-1307, USA.
 
 from AccessControl import ClassSecurityInfo
-from Globals import InitializeClass
-from Globals import DTMLFile
+from App.special_dtml import DTMLFile
+from App.class_init import InitializeClass
 
 from OFS.PropertyManager import PropertyManager
 

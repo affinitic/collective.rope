@@ -15,10 +15,11 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-import simpleitem
-import portalcontent
 
 def initialize(context):
+    import simpleitem
+    import portalcontent
+
     context.registerClass(
         simpleitem.RopeSimpleItem,
         constructors=(simpleitem.manage_addRopeSimpleItemForm,

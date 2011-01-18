@@ -2,8 +2,18 @@
            xmlns:five="http://namespaces.zope.org/five"
            >
 
-    <five:registerPackage package="collective.rope" initialize=".initialize" />
+     <five:registerPackage package="collective.rope" initialize=".initialize" />
  
-    <include package=".tests" />
+     <adapter
+         for="collective.rope.interfaces.IRDBFolder"
+         factory=".keys.KeyIdSubobjectSupport"
+         provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
+   
+     <adapter
+         for="collective.rope.interfaces.IStoredInRDB"
+         factory=".keys.KeyIdSubobjectSupport"
+         provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
+
+     <include package=".tests" />
 
 </configure>

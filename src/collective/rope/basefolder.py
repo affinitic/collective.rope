@@ -22,7 +22,7 @@ from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
 from AccessControl.Permissions import access_contents_information
 
-from Globals import InitializeClass
+from App.class_init import InitializeClass
 
 from Acquisition import aq_base
 
@@ -225,7 +225,6 @@ class BaseFolder(Folder):
         v = self._checkId(id)
         if v is not None:
             id = v
-        t = getattr(ob, 'meta_type', None)
 
         # If an object by the given id already exists, remove it.
         makeKeyFromId = IKeyIdSubobjectSupport(self).makeKeyFromId

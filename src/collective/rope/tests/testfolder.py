@@ -21,6 +21,8 @@ from Testing.ZopeTestCase import ZopeTestCase
 from Testing.ZopeTestCase import user_name, user_password
 from Testing.ZopeTestCase import FunctionalTestCase
 
+from zope.container.tests.test_icontainer import BaseTestIContainer
+
 from Products.Five.testbrowser import Browser
 from collective.rope.tests.layer import Rope
 from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
@@ -52,8 +54,6 @@ class FolderTests(ZopeTestCase):
         rope = getattr(self.folder, FOLDER_ID)
         self.assertRaises(AttributeError, rope._getOb, 'notfound')
 
-from zope.app.container.tests.test_icontainer import BaseTestIContainer
-
 
 class IContainerTests(ZopeTestCase, BaseTestIContainer):
     layer = Rope
@@ -66,11 +66,11 @@ class IContainerTests(ZopeTestCase, BaseTestIContainer):
         return getattr(self.folder, FOLDER_ID)
 
     def makeTestData(self):
-        self.__container = container = self.makeTestObject()
+        self.__container = self.makeTestObject()
         class_ = self.__container.getMapperClass()
         dataSet = []
         for i in range(0, 10):
-            item_id = u"%s_icontainer_rf"%i
+            item_id = u"%s_icontainer_rf" % i
             ob = class_()
             ob.id = item_id
             dataSet.append((item_id, ob))
@@ -91,7 +91,7 @@ class FolderBrowserTests(FunctionalTestCase):
         self.browser = Browser()
         self.browser.handleErrors = False
         self.browser.addHeader('Authorization',
-                'Basic %s:%s'%(user_name, user_password))
+                'Basic %s:%s' % (user_name, user_password))
         self.folder_path = 'http://localhost/' + self.folder.absolute_url(1)
 
     def testAddRopeFolder(self):

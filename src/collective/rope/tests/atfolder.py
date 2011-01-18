@@ -28,7 +28,6 @@ from Products.Archetypes.ExtensibleMetadata import ExtensibleMetadata
 from Products.Archetypes.interfaces import IBaseFolder
 from Products.Archetypes.interfaces import IBaseObject
 from Products.Archetypes.interfaces import IReferenceable
-from Products.Archetypes.interfaces.metadata import IExtensibleMetadata
 
 from collective.rope.baseatfolder import BaseFolderMixin
 
@@ -40,7 +39,6 @@ class RopeATFolder(BaseFolderMixin, ExtensibleMetadata):
     """A not-so-basic Folder implementation, with Dublin Core
     Metadata included"""
 
-    __implements__ = BaseFolderMixin.__implements__, IExtensibleMetadata
     implements(IBaseFolder, IBaseObject, IReferenceable, IContentish)
 
     schema = BaseFolderMixin.schema + ExtensibleMetadata.schema

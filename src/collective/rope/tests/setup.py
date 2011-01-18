@@ -36,7 +36,7 @@ from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import noSecurityManager
 from Acquisition import aq_base
 from time import time
-from Globals import PersistentMapping
+from Persistence import PersistentMapping
 
 portal_owner = 'portal_owner'
 default_user = ZopeTestCase.user_name
@@ -44,6 +44,7 @@ default_password = ZopeTestCase.user_password
 
 default_base_profile = 'Products.CMFDefault:default'
 default_extension_profiles = ()
+
 
 def setupPortal(id=portal_name,
                    quiet=0,
@@ -88,7 +89,8 @@ class PortalSetup:
             uf = self.app.acl_users
             if uf.getUserById(portal_owner) is None:
                 # Add portal owner
-                uf.userFolderAddUser(portal_owner, default_password, ['Manager'], [])
+                uf.userFolderAddUser(portal_owner, default_password,
+                    ['Manager'], [])
             if not hasattr(aq_base(self.app), self.id):
                 # Add site
                 self._login(uf, portal_owner)
@@ -114,7 +116,7 @@ class PortalSetup:
         factory.addConfiguredSite(site_id=portal_name,
             profile_id="Products.CMFDefault:default")
         self._commit()
-        self._print('done (%.3fs)\n' % (time()-start,))
+        self._print('done (%.3fs)\n' % (time() - start,))
 
     def _setupRegistries(self):
         '''Installs persistent registries.'''
@@ -136,7 +138,7 @@ class PortalSetup:
                     setup.runAllImportStepsFromProfile(profile_id)
                     portal._installed_profiles[profile] = 1
                     self._commit()
-                    self._print('done (%.3fs)\n' % (time()-start,))
+                    self._print('done (%.3fs)\n' % (time() - start,))
 
     def _placefulSetUp(self):
         '''Sets the local site/manager.'''
@@ -222,14 +224,17 @@ def _placefulTearDown():
     resetHooks()
     setSite()
 
+
 def _optimize():
     '''Significantly reduces portal creation time.'''
     # Don't compile expressions on creation
+
     def __init__(self, text):
         self.text = text
     from Products.CMFCore.Expression import Expression
     Expression.__init__ = __init__
     # Don't clone actions but convert to list only
+
     def _cloneActions(self):
         return list(self._actions)
     from Products.CMFCore.ActionProviderBase import ActionProviderBase

@@ -18,8 +18,8 @@ import types
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import view_management_screens
 
-from Globals import DTMLFile
-from Globals import InitializeClass
+from App.special_dtml import DTMLFile
+from App.class_init import InitializeClass
 
 import ExtensionClass
 
@@ -44,7 +44,7 @@ class Folder(BaseFolder):
 
     security = ClassSecurityInfo()
     from OFS.Folder import Folder
-    manage_options=(
+    manage_options = (
         ({'label': 'Contents', 'action': 'manage_main', },
          ) + Folder.manage_options[1:]
         )
