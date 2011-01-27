@@ -24,9 +24,11 @@ import plone.testing.z2
 
 from collective.rope.testing import ZTC_ROPE_INTEGRATION
 from collective.rope.testing import ZTC_ROPE_FUNCTIONAL
-from collective.rope.testing import ZTCCompatTestCase
-from collective.rope.testing import user_name
-from collective.rope.testing import user_password
+
+from collective.rope.zopetestcasecompat import user_name
+from collective.rope.zopetestcasecompat import user_password
+from collective.rope.zopetestcasecompat import ZTCCompatTestCase
+
 from collective.rope.tests.testfolder import FOLDER_ID
 from collective.rope.tests.simpleitem import manage_addRopeSimpleItem
 from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
