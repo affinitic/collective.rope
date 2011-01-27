@@ -28,6 +28,9 @@ setup(name='collective.rope',
           'z3c.saconfig',
       ],
       extras_require=dict(
+          plone=[
+               'Plone',
+               ],
           test=[
                'plone.app.testing',
                ],
