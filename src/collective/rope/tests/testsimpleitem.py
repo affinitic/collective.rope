@@ -20,16 +20,16 @@ import transaction
 
 from urllib2 import HTTPError
 
-from Testing.ZopeTestCase import ZopeTestCase
-from Testing.ZopeTestCase import user_name, user_password
-from Testing.ZopeTestCase import FunctionalTestCase
+import plone.testing.z2
 
-from Products.Five.testbrowser import Browser
-
+from collective.rope.testing import ZTC_ROPE_INTEGRATION
+from collective.rope.testing import ZTC_ROPE_FUNCTIONAL
+from collective.rope.testing import ZTCCompatTestCase
+from collective.rope.testing import user_name
+from collective.rope.testing import user_password
 from collective.rope.tests.testfolder import FOLDER_ID
-from collective.rope.tests.layer import Rope
-from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
 from collective.rope.tests.simpleitem import manage_addRopeSimpleItem
+from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
 from collective.rope.folder import manage_addFolder
 
 ITEM_KEY = 'first_rf'
@@ -38,8 +38,8 @@ ITEM_TITLE = 'First Rope Simple'
 ITEM_VIEW = '%s (%s)' % (ITEM_ID, ITEM_TITLE)
 
 
-class SimpleItemBaseTests(ZopeTestCase):
-    layer = Rope
+class SimpleItemBaseTests(ZTCCompatTestCase):
+    layer = ZTC_ROPE_INTEGRATION
 
     def afterSetUp(self):
         manage_addFolder(self.folder,
@@ -60,6 +60,7 @@ class SimpleItemTests(SimpleItemBaseTests):
     def testDeleteSimpleItem(self):
         rope = self.rope
         manage_addRopeSimpleItem(rope, ITEM_ID)
+        self.failUnless(ITEM_ID in rope.objectIds())
         rope.manage_delObjects([ITEM_ID])
         self.failIf(rope.objectIds())
 
@@ -104,20 +105,21 @@ class SimpleItemTestsWithCommits(SimpleItemBaseTests):
         self.failUnless(ITEM_ID in rope.objectIds())
 
 
-class ItemBrowserTests(FunctionalTestCase):
-    layer = Rope
+class ItemBrowserTests(ZTCCompatTestCase):
+    layer = ZTC_ROPE_FUNCTIONAL
 
     def afterSetUp(self):
         self.setRoles(['Manager'])
-        self.browser = Browser()
-        self.browser.handleErrors = False
-        self.browser.addHeader('Authorization',
-                'Basic %s:%s'%(user_name, user_password))
-        self.folder_path = 'http://localhost/' + self.folder.absolute_url(1)
+        self.folder_path = self.folder.absolute_url()
         manage_addFolder(self.folder,
             FOLDER_ID, SIMPLE_ITEM_MAPPER)
         self.rope = getattr(self.folder, FOLDER_ID)
         self.item_path = self.folder_path + '/%s/%s' % (FOLDER_ID, ITEM_ID)
+        transaction.commit()
+        self.browser = plone.testing.z2.Browser(self.layer['app'])
+        self.browser.handleErrors = False
+        self.browser.addHeader('Authorization',
+                'Basic %s:%s' % (user_name, user_password))
 
     def testAdd(self):
         browser = self.browser
@@ -133,6 +135,7 @@ class ItemBrowserTests(FunctionalTestCase):
     def testEdit(self):
         rope = self.rope
         manage_addRopeSimpleItem(rope, ITEM_ID)
+        transaction.commit()
         browser = self.browser
         browser.open(self.item_path + '/manage_workspace')
         ctl = browser.getControl(name='title:UTF-8:string')
@@ -145,6 +148,7 @@ class ItemBrowserTests(FunctionalTestCase):
     def testDelete(self):
         rope = self.rope
         manage_addRopeSimpleItem(rope, ITEM_ID)
+        transaction.commit()
         browser = self.browser
         browser.open(self.folder_path + '/%s/manage_main' % FOLDER_ID)
         ctl = browser.getControl(name='ids:list')
@@ -155,12 +159,13 @@ class ItemBrowserTests(FunctionalTestCase):
     def testPermission(self):
         rope = self.rope
         manage_addRopeSimpleItem(rope, ITEM_ID)
+        transaction.commit()
         browser = self.browser
         browser.open(self.item_path)
         self.assertEquals('200 OK'.lower(),
                 browser.headers['status'].lower())
         # browser used by 'anonymous'
-        anonymous = Browser()
+        anonymous = plone.testing.z2.Browser(self.layer['app'])
         # anonymous can access
         anonymous.open(self.item_path)
         self.assertEquals('200 OK'.lower(),
@@ -184,7 +189,7 @@ class ItemBrowserTests(FunctionalTestCase):
         ctl.value = False
         browser.getControl(name='submit').click()
         # anonymous can access again
-        anonymous = Browser()
+        anonymous = plone.testing.z2.Browser(self.layer['app'])
         anonymous.open(self.item_path)
         self.assertEquals('200 OK'.lower(),
                 anonymous.headers['status'].lower())
@@ -194,9 +199,10 @@ class ItemBrowserTests(FunctionalTestCase):
         uf._addUser('other', 'other', 'other', [], ())
         rope = self.rope
         manage_addRopeSimpleItem(rope, ITEM_ID)
+        transaction.commit()
         # browser used by 'other'
-        other = Browser()
-        other.addHeader('Authorization', 'Basic %s:%s'%('other', 'other'))
+        other = plone.testing.z2.Browser(self.layer['app'])
+        other.addHeader('Authorization', 'Basic %s:%s' % ('other', 'other'))
         # other cannot access properties page
         self.assertRaises(HTTPError,
                 other.open,

@@ -21,6 +21,7 @@ standard_permissions = [AccessControl.Permissions.access_contents_information,
 class ZTCCompatTestCase(unittest.TestCase):
 
     def setUp(self):
+        self.app = self.layer['app']
         self.folder = self.layer['folder']
         self.afterSetUp()
 
