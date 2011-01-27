@@ -14,17 +14,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
-
 import unittest
-
-from Testing.ZopeTestCase import ZopeTestCase
-from Testing.ZopeTestCase import user_name, user_password
-from Testing.ZopeTestCase import FunctionalTestCase
+import transaction
 
 from zope.container.tests.test_icontainer import BaseTestIContainer
 
-from Products.Five.testbrowser import Browser
-from collective.rope.tests.layer import Rope
+from collective.rope.testing import ZTC_ROPE_INTEGRATION
+from collective.rope.testing import ZTC_ROPE_FUNCTIONAL
+from collective.rope.testing import user_name
+from collective.rope.testing import user_password
+from collective.rope.testing import ZTCCompatTestCase
 from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
 
 from collective.rope.folder import manage_addFolder
@@ -34,8 +33,8 @@ ITEM_KEY = 'rope_first_rf'
 ITEM_ID = '%s' % ITEM_KEY
 
 
-class FolderTests(ZopeTestCase):
-    layer = Rope
+class FolderTests(ZTCCompatTestCase):
+    layer = ZTC_ROPE_INTEGRATION
 
     def testInstantiateFolder(self):
         manage_addFolder(self.folder,
@@ -55,8 +54,8 @@ class FolderTests(ZopeTestCase):
         self.assertRaises(AttributeError, rope._getOb, 'notfound')
 
 
-class IContainerTests(ZopeTestCase, BaseTestIContainer):
-    layer = Rope
+class IContainerTests(ZTCCompatTestCase, BaseTestIContainer):
+    layer = ZTC_ROPE_INTEGRATION
 
     def makeTestObject(self):
         if hasattr(self.folder, FOLDER_ID):
@@ -83,21 +82,25 @@ class IContainerTests(ZopeTestCase, BaseTestIContainer):
         return [None, ['foo'], 1, '\xf3abc']
 
 
-class FolderBrowserTests(FunctionalTestCase):
-    layer = Rope
+class FolderBrowserTests(ZTCCompatTestCase):
+    layer = ZTC_ROPE_FUNCTIONAL
 
     def afterSetUp(self):
         self.setRoles(['Manager'])
-        self.browser = Browser()
+        transaction.commit()
+        import plone.testing.z2
+        self.browser = plone.testing.z2.Browser(self.layer['app'])
         self.browser.handleErrors = False
         self.browser.addHeader('Authorization',
                 'Basic %s:%s' % (user_name, user_password))
-        self.folder_path = 'http://localhost/' + self.folder.absolute_url(1)
+        self.folder_path = self.folder.absolute_url()
 
     def testAddRopeFolder(self):
         browser = self.browser
-        browser.open(self.folder_path + \
+        browser.open(self.folder_path)
+        url = (self.folder_path + \
                 '/manage_addProduct/collective.rope/folderAdd')
+        browser.open(url)
         ctl = browser.getControl(name='id')
         ctl.value = FOLDER_ID
         ctl = browser.getControl(name='itemClass')
@@ -110,6 +113,7 @@ class FolderBrowserTests(FunctionalTestCase):
     def testViewRopeFolder(self):
         manage_addFolder(self.folder,
             FOLDER_ID, SIMPLE_ITEM_MAPPER)
+        transaction.commit()
         browser = self.browser
         browser.open(self.folder_path + '/%s/manage_main' % FOLDER_ID)
         self.failUnless('Rope Folder' in browser.contents)
@@ -117,6 +121,7 @@ class FolderBrowserTests(FunctionalTestCase):
     def testDeleteRopeFolder(self):
         manage_addFolder(self.folder,
             FOLDER_ID, SIMPLE_ITEM_MAPPER)
+        transaction.commit()
         browser = self.browser
         browser.open(self.folder_path + '/manage_main')
         ctl = browser.getControl(name='ids:list')

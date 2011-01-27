@@ -3,6 +3,8 @@
            xmlns:db="http://namespaces.zope.org/db"
            >
 
+    <five:registerPackage package="collective.rope.tests" initialize=".initialize" />
+    
     <include package="z3c.saconfig" file="meta.zcml"/>
 
     <!-- db:engine name="collective.rope.tests" url="sqlite:///:memory:"
@@ -28,6 +30,9 @@
              provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
 
     <include file="content.zcml"/>
+
+    <include package="Products.GenericSetup" file="meta.zcml" />
+    <include package="Products.GenericSetup" />
 
     <include file="profiles.zcml"/>
     

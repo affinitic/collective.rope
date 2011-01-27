@@ -1,19 +1,10 @@
 <configure xmlns="http://namespaces.zope.org/zope"
            xmlns:five="http://namespaces.zope.org/five"
            >
-
+    
+     <include package="Products.Five" file="meta.zcml" />
+     <include package="z3c.saconfig" file="meta.zcml" />
+  
      <five:registerPackage package="collective.rope" initialize=".initialize" />
  
-     <adapter
-         for="collective.rope.interfaces.IRDBFolder"
-         factory=".keys.KeyIdSubobjectSupport"
-         provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
-   
-     <adapter
-         for="collective.rope.interfaces.IStoredInRDB"
-         factory=".keys.KeyIdSubobjectSupport"
-         provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
-
-     <include package=".tests" />
-
 </configure>
