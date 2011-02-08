@@ -123,6 +123,15 @@ class ItemBrowserTests(ZTCCompatTestCase):
         self.browser.addHeader('Authorization',
                 'Basic %s:%s' % (user_name, user_password))
 
+    def beforeTearDown(self):
+        transaction.abort()
+        folderid = self.folder.getId()
+        if folderid in self.app.objectIds():
+            rope = self.rope
+            rope.manage_delObjects(rope.objectIds())
+            self.app.manage_delObjects([folderid])
+            transaction.commit()
+
     def testAdd(self):
         browser = self.browser
         browser.open(self.folder_path + \
