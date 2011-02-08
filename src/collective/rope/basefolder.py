@@ -303,7 +303,9 @@ class BaseFolder(Folder):
             query = self.saSession.query(self.item_class)
             query = query.with_polymorphic('*')
             subobject = query.get(key)
-            if subobject is None:
+            if subobject in self.saSession.deleted:
+                raise KeyError
+            elif subobject is None:
                 raise KeyError
             else:
                 return utils.wrapsetup(subobject, parent=self)
