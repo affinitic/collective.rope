@@ -304,7 +304,9 @@ class BaseFolder(Folder):
         query = self.saSession.query(self.item_class)
         query = query.with_polymorphic('*')
         subobject = query.get(key)
+        # subobject could have already been deleted
         if subobject in self.saSession.deleted:
+            # but a new object with the same key could have been created
             subobject = self.__getNewFromSA(key)
             if subobject is None:
                 raise KeyError
