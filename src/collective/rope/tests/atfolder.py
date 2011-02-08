@@ -16,7 +16,7 @@
 # 02111-1307, USA.
 
 from AccessControl import ClassSecurityInfo
-from Globals import InitializeClass
+from App.class_init import InitializeClass
 
 from zope.interface import implements
 from zope.component.factory import Factory
