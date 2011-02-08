@@ -14,7 +14,7 @@
 from AccessControl import ClassSecurityInfo
 from AccessControl.Owned import Owned
 from Acquisition import aq_base
-from Globals import InitializeClass
+from App.class_init import InitializeClass
 from zope.interface import implements
 
 from OFS.PropertyManager import PropertyManager
