@@ -298,19 +298,25 @@ class BaseFolder(Folder):
 
     def __getObjectFromSA__(self, path):
         #database access
-        if self.item_class:
-            key = IKeyIdSubobjectSupport(self).makeKeyFromId(path)
-            query = self.saSession.query(self.item_class)
-            query = query.with_polymorphic('*')
-            subobject = query.get(key)
-            if subobject in self.saSession.deleted:
-                raise KeyError
-            elif subobject is None:
-                raise KeyError
-            else:
-                return utils.wrapsetup(subobject, parent=self)
-        else:
+        if not self.item_class:
             raise ValueError('mapperName not set')
+        key = IKeyIdSubobjectSupport(self).makeKeyFromId(path)
+        query = self.saSession.query(self.item_class)
+        query = query.with_polymorphic('*')
+        subobject = query.get(key)
+        if subobject in self.saSession.deleted:
+            subobject = self.__getNewFromSA(key)
+            if subobject is None:
+                raise KeyError
+        elif subobject is None:
+            raise KeyError
+        return utils.wrapsetup(subobject, parent=self)
+
+    def __getNewFromSA(self, key):
+        for new_obj in self.saSession.new:
+            if (isinstance(new_obj, self.item_class) 
+                and (new_obj.key == key)):
+                return new_obj
 
     def __addObjectToSA__(self, ob):
         self.saSession.add(ob)
