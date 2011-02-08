@@ -12,7 +12,7 @@ from Products.Archetypes.Widget import IdWidget
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import copy_or_move as permission_copy_or_move
 
-from Globals import InitializeClass
+from App.class_init import InitializeClass
 from OFS.History import Historical
 from Products.CMFCore import permissions
 
