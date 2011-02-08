@@ -1,0 +1,43 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:five="http://namespaces.zope.org/five"
+           xmlns:db="http://namespaces.zope.org/db"
+           >
+
+    <include file="zope.zcml" />
+
+    <adapter for="collective.rope.baseatcontent.BaseContentMixin"
+             factory="collective.rope.baseatcontent.KeyIdSubobjectSupport" 
+             provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
+    
+    <adapter for="collective.rope.baseportalcontent.BasePortalContent"
+             factory="collective.rope.baseatcontent.KeyIdSubobjectSupport" 
+             provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
+
+    <five:registerClass
+        class=".atcontent.RopeATContent"
+        meta_type="Rope AT Content"
+        permission="cmf.AddPortalContent"
+        />
+
+    <five:registerClass
+        class=".atfolder.RopeATFolder"
+        meta_type="Rope AT Folder"
+        permission="cmf.AddPortalContent"
+        />
+
+    <utility
+        component=".atcontent.RopeATFactory"
+        name="rope.atcontent"
+        />
+
+    <utility
+        component=".atfolder.RopeATFolderFactory"
+        name="rope.atfolder"
+        />
+
+    <include package="Products.GenericSetup" file="meta.zcml" />
+    <include package="Products.GenericSetup" />
+
+    <include file="profiles.zcml"/>
+    
+</configure>

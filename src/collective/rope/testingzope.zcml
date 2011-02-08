@@ -5,10 +5,10 @@
 
      <include file="configure.zcml" />
      
-     <include package=".tests" />
-
      <db:engine name="dummy" url="sqlite:///:file.db"
              setup="collective.rope.tests.layer.setupDatabase"/>
      <db:session name="" engine="dummy" />
+     
+     <include package=".tests" file="zope.zcml"/>
 
 </configure>

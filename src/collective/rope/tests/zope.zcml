@@ -1,0 +1,14 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:five="http://namespaces.zope.org/five"
+           xmlns:db="http://namespaces.zope.org/db"
+           >
+
+    <adapter for="collective.rope.interfaces.IRDBFolder"
+             factory="collective.rope.basefolder.KeyIdSubobjectSupport" 
+             provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
+    
+    <adapter for="collective.rope.interfaces.IStoredInRDB"
+             factory="collective.rope.basefolder.KeyIdSubobjectSupport" 
+             provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
+
+</configure>

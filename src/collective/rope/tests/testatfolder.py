@@ -17,21 +17,18 @@
 
 import unittest
 
-from Products.PloneTestCase.PloneTestCase import PloneTestCase
-from Products.PloneTestCase.setup import setupPloneSite
-
 from Products.CMFCore.utils import getToolByName
 
-from collective.rope.tests.layer import RopePloneSite
+from collective.rope.plonetestcasecompat import PTCCompatTestCase
+
+from collective.rope.testing import PTC_PLONE_ROPE_INTEGRATION
 from collective.rope.tests.layer import AT_CONTENT_MAPPER
 
 FOLDER_ID = 'rope'
 
-setupPloneSite(extension_profiles=['collective.rope.tests:ropeonat'])
 
-
-class ATFolderTests(PloneTestCase):
-    layer = RopePloneSite
+class ATFolderTests(PTCCompatTestCase):
+    layer = PTC_PLONE_ROPE_INTEGRATION
 
     def afterSetUp(self):
         self.setRoles(['Manager'])

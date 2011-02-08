@@ -20,23 +20,21 @@ import transaction
 
 from Products.CMFCore.utils import getToolByName
 
+from collective.rope.plonetestcasecompat import PTCCompatTestCase
+
 from collective.rope.tests.testfolder import FOLDER_ID
-from collective.rope.tests.layer import RopePloneSite
+from collective.rope.testing import PTC_PLONE_ROPE_INTEGRATION
 from collective.rope.tests.layer import AT_CONTENT_MAPPER
 
-from Products.PloneTestCase.PloneTestCase import PloneTestCase
-from Products.PloneTestCase.setup import setupPloneSite
 
 ITEM_KEY = 'first_rf'
 ITEM_ID = '%s' % ITEM_KEY
 ITEM_TITLE = 'First Rope ATContent'
 ITEM_VIEW = '%s (%s)' % (ITEM_ID, ITEM_TITLE)
 
-setupPloneSite(extension_profiles=['collective.rope.tests:ropeonat'])
 
-
-class ATContentBaseTests(PloneTestCase):
-    layer = RopePloneSite
+class ATContentBaseTests(PTCCompatTestCase):
+    layer = PTC_PLONE_ROPE_INTEGRATION
 
     def afterSetUp(self):
         self.setRoles(['Manager'])

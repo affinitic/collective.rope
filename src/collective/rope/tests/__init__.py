@@ -18,13 +18,15 @@
 
 def initialize(context):
     import simpleitem
-    import portalcontent
 
     context.registerClass(
         simpleitem.RopeSimpleItem,
         constructors=(simpleitem.manage_addRopeSimpleItemForm,
                       simpleitem.manage_addRopeSimpleItem),
         )
+
+    import portalcontent
+
     context.registerClass(
         portalcontent.RopePortalContent,
         constructors=(simpleitem.manage_addRopeSimpleItemForm,
