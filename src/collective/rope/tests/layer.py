@@ -101,19 +101,19 @@ def _setup_mappers(tables, mappers):
     t_simpleitem = tables['t_simpleitem']
     j = sqlalchemy.sql.join(t_data, t_simpleitem)
     from collective.rope.tests.simpleitem import RopeSimpleItem
-    mappers['m_simpleitem'] = sqlalchemy.orm.mapper(RopeSimpleItem, j)
-
+    mappers['m_simpleitem'] = sqlalchemy.orm.mapper(RopeSimpleItem, j,
+        properties={'key':[t_data.c.key, t_simpleitem.c.key],})
     t_portalcontent = tables['t_portalcontent']
     j = sqlalchemy.sql.join(t_data, t_portalcontent)
     from collective.rope.tests.portalcontent import RopePortalContent
     mappers['m_portalcontent'] = sqlalchemy.orm.mapper(
-            RopePortalContent,
-            j)
-
+        RopePortalContent, j, 
+        properties={'key':[t_data.c.key, t_portalcontent.c.key],})
     t_atcontent = tables['t_atcontent']
     j = sqlalchemy.sql.join(t_data, t_atcontent)
     from collective.rope.tests.atcontent import RopeATContent
-    mappers['m_atcontent'] = sqlalchemy.orm.mapper(RopeATContent, j)
+    mappers['m_atcontent'] = sqlalchemy.orm.mapper(RopeATContent, j,
+        properties={'key':[t_data.c.key, t_atcontent.c.key],})
 
 
 from zope.testing.cleanup import cleanUp as _cleanUp
