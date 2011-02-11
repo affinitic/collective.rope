@@ -6,6 +6,8 @@ import plone.app.testing.layers
 
 import collective.rope
 
+from collective.rope import cmf_layers
+
 from collective.rope.zopetestcasecompat import ZTCCompatIntegration
 from collective.rope.zopetestcasecompat import ZTCCompatFunctional
 
@@ -46,6 +48,43 @@ ZTC_ROPE_INTEGRATION = ZTCCompatIntegration(
 ZTC_ROPE_FUNCTIONAL = ZTCCompatFunctional(
     bases=(ROPE_FIXTURE, ),
     name='ZTC:Rope:Functional')
+
+
+class CMFRopeZcml(plone.testing.Layer):
+
+    defaultBases = (ROPE_FIXTURE, )
+
+    def setUp(self):
+        # Create a new global registry
+        plone.testing.zca.pushGlobalRegistry()
+        zope.configuration.xmlconfig.file(
+            'testingcmf.zcml', package=collective.rope,
+            context=self.get('configurationContext'))
+
+    def tearDown(self):
+        # Pop the global registry
+        plone.testing.zca.popGlobalRegistry()
+
+CMF_ROPE_ZCML_FIXTURE = CMFRopeZcml(name="CMFRopeZcml")
+
+
+class CMFRope(plone.testing.Layer):
+    defaultBases = (CMF_ROPE_ZCML_FIXTURE, cmf_layers.PORTAL_FIXTURE)
+
+    def setUp(self):
+        with cmf_layers.CMFDefaultPortal() as portal:
+            cmf_layers.applyProfile(portal,
+                'collective.rope.tests:ropeoncmf')
+
+CMF_ROPE_FIXTURE = CMFRope(name="CMFRope")
+
+CMF_ROPE_INTEGRATION = cmf_layers.IntegrationTesting(
+    bases=(CMF_ROPE_FIXTURE, ),
+    name='CMFRope:Integration')
+
+CMF_ROPE_FUNCTIONAL = cmf_layers.FunctionalTesting(
+    bases=(CMF_ROPE_FIXTURE, ),
+    name='CMFRope:Functional')
 
 
 class PloneRopeZcml(plone.testing.Layer):

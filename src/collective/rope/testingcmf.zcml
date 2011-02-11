@@ -1,0 +1,8 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           >
+
+     <include file="testingzope.zcml" />
+     
+     <include package=".tests" file="cmf.zcml"/>
+
+</configure>

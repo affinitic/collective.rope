@@ -15,38 +15,38 @@
              factory="collective.rope.baseatcontent.KeyIdSubobjectSupport" 
              provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
 
-    <five:registerClass
-        class=".atcontent.RopeATContent"
-        meta_type="Rope AT Content"
-        permission="cmf.AddPortalContent"
-        />
+  <five:registerClass
+      class=".portalcontent.RopePortalContent"
+      meta_type="Rope Portal Content"
+      permission="cmf.AddPortalContent"
+      />
 
-    <five:registerClass
-        class=".atfolder.RopeATFolder"
-        meta_type="Rope AT Folder"
-        permission="cmf.AddPortalContent"
-        />
+  <five:registerClass
+      class=".portalfolder.RopePortalFolder"
+      meta_type="Rope Portal Folder"
+      permission="cmf.AddPortalContent"
+      />
 
-    <utility
-        component=".atcontent.RopeATFactory"
-        name="rope.atcontent"
-        />
+  <utility
+      component=".portalcontent.RopeFactory"
+      name="rope.portalcontent"
+      />
 
-    <utility
-        component=".atfolder.RopeATFolderFactory"
-        name="rope.atfolder"
-        />
+  <utility
+      component=".portalfolder.RopePortalFolderFactory"
+      name="rope.portalfolder"
+      />
 
     <include package="Products.GenericSetup" file="meta.zcml" />
     <include package="Products.GenericSetup" />
-  
+
   <genericsetup:registerProfile
-      name="ropeonat"
-      title="Rope On Archetypes Tests"
-      description="Tests of Rope content in Plone site"
-      directory="profiles/ropeonat"
+      name="ropeoncmf"
+      title="Rope On CMFDefault Tests"
+      description="Tests of Rope content in CMFDefault site."
+      directory="profiles/ropeoncmf"
       provides="Products.GenericSetup.interfaces.EXTENSION"
-      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      for="Products.CMFCore.interfaces.ISiteRoot"
       />
     
 </configure>

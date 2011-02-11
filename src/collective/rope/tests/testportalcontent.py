@@ -18,26 +18,22 @@
 import unittest
 import transaction
 
-from Testing.ZopeTestCase import PortalTestCase
-
 from Products.CMFCore.utils import getToolByName
 
 from collective.rope.tests.testfolder import FOLDER_ID
-from collective.rope.tests.layer import RopePortal
-from collective.rope.tests.layer import Portal
 from collective.rope.tests.layer import PORTAL_CONTENT_MAPPER
-from collective.rope.tests.setup import setupPortal
+
+from collective.rope.portaltestcasecompat import PTCCompatTestCase
+from collective.rope.testing import CMF_ROPE_INTEGRATION
 
 ITEM_KEY = 'first_rf'
 ITEM_ID = '%s' % ITEM_KEY
 ITEM_TITLE = 'First Rope PortalContent'
 ITEM_VIEW = '%s (%s)' % (ITEM_ID, ITEM_TITLE)
 
-setupPortal(extension_profiles=['collective.rope.tests:ropeoncmf'])
 
-
-class PortalContentBaseTests(PortalTestCase):
-    layer = RopePortal
+class PortalContentBaseTests(PTCCompatTestCase):
+    layer = CMF_ROPE_INTEGRATION
 
     def afterSetUp(self):
         self.setRoles(['Manager'])
@@ -53,8 +49,8 @@ class PortalContentBaseTests(PortalTestCase):
         self.rope = getattr(self.folder, FOLDER_ID)
 
 
-class PortalTests(PortalTestCase):
-    layer = Portal
+class PortalTests(PTCCompatTestCase):
+    layer = CMF_ROPE_INTEGRATION
 
     def testPortal(self):
         self.assertEquals(self.portal.meta_type, 'CMF Site')
