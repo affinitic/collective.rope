@@ -14,9 +14,9 @@ setup(name='collective.rope',
         "Topic :: Software Development :: Libraries :: Python Modules",
         ],
       keywords='',
-      author='',
-      author_email='',
-      url='',
+      author='Plone Community',
+      author_email='plone@plone.org',
+      url='http://svn.plone.org/svn/collective/collective.rope',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['collective'],
@@ -24,10 +24,6 @@ setup(name='collective.rope',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'z3c.saconfig',
-          # -*- Extra requirements: -*-
-      ],
-      entry_points="""
-      # -*- Entry points: -*-
-      """,
-      )
+          'z3c.saconfig'],
+      extras_require=dict(
+            test=['zope.testing', 'Products.CMFTestCase']))
