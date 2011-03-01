@@ -1,7 +1,5 @@
-import zope.configuration
-
-import plone.testing.z2
-import plone.testing.zca
+from plone.testing import z2
+from plone.testing import zca
 import plone.app.testing.layers
 
 import collective.rope
@@ -14,31 +12,27 @@ from collective.rope.zopetestcasecompat import ZTCCompatFunctional
 
 class RopeZcml(plone.testing.Layer):
 
-    defaultBases = (plone.testing.z2.STARTUP, )
+    defaultBases = (z2.STARTUP, )
 
     def setUp(self):
-        # Create a new global registry
-        plone.testing.zca.pushGlobalRegistry()
-
-        zope.configuration.xmlconfig.file(
-            'testingzope.zcml', package=collective.rope,
-            context=self.get('configurationContext'))
-        with plone.testing.z2.zopeApp() as app:
-            plone.testing.z2.installProduct(app, 'collective.rope')
+        zca.setUpZcmlFiles((
+            ('testingzope.zcml', collective.rope),
+            ))
+        with z2.zopeApp() as app:
+            z2.installProduct(app, 'collective.rope')
 
     def tearDown(self):
-        with plone.testing.z2.zopeApp() as app:
-            plone.testing.z2.uninstallProduct(app, 'collective.rope')
-        # Pop the global registry
-        plone.testing.zca.popGlobalRegistry()
+        with z2.zopeApp() as app:
+            z2.uninstallProduct(app, 'collective.rope')
+        zca.tearDownZcmlFiles()
 
 
 ROPE_FIXTURE = RopeZcml(name="RopeZcml")
 
-ROPE_INTEGRATION = plone.testing.z2.IntegrationTesting(bases=(ROPE_FIXTURE,),
+ROPE_INTEGRATION = z2.IntegrationTesting(bases=(ROPE_FIXTURE,),
     name="Rope:Integration")
 
-ROPE_FUNCTIONAL = plone.testing.z2.FunctionalTesting(bases=(ROPE_FIXTURE,),
+ROPE_FUNCTIONAL = z2.FunctionalTesting(bases=(ROPE_FIXTURE,),
 name="Rope:Functional")
 
 ZTC_ROPE_INTEGRATION = ZTCCompatIntegration(
@@ -55,20 +49,20 @@ class CMFRopeZcml(plone.testing.Layer):
     defaultBases = (ROPE_FIXTURE, )
 
     def setUp(self):
-        # Create a new global registry
-        plone.testing.zca.pushGlobalRegistry()
-        zope.configuration.xmlconfig.file(
-            'testingcmf.zcml', package=collective.rope,
-            context=self.get('configurationContext'))
+        zca.setUpZcmlFiles((
+            ('testingcmf.zcml', collective.rope),
+            ))
 
     def tearDown(self):
-        # Pop the global registry
-        plone.testing.zca.popGlobalRegistry()
+        zca.tearDownZcmlFiles()
+
 
 CMF_ROPE_ZCML_FIXTURE = CMFRopeZcml(name="CMFRopeZcml")
 
 
 class CMFRope(plone.testing.Layer):
+    # Rope ZCML must be setup before CMF portal local registry is hooked to a
+    # global registry
     defaultBases = (CMF_ROPE_ZCML_FIXTURE, cmf_layers.PORTAL_FIXTURE)
 
     def setUp(self):
@@ -92,20 +86,20 @@ class PloneRopeZcml(plone.testing.Layer):
     defaultBases = (ROPE_FIXTURE, )
 
     def setUp(self):
-        # Create a new global registry
-        plone.testing.zca.pushGlobalRegistry()
-        zope.configuration.xmlconfig.file(
-            'testingplone.zcml', package=collective.rope,
-            context=self.get('configurationContext'))
+        zca.setUpZcmlFiles((
+            ('testingplone.zcml', collective.rope),
+            ))
 
     def tearDown(self):
-        # Pop the global registry
-        plone.testing.zca.popGlobalRegistry()
+        zca.tearDownZcmlFiles()
+
 
 PLONE_ROPE_ZCML_FIXTURE = PloneRopeZcml(name="PloneRopeZcml")
 
 
 class PloneRope(plone.testing.Layer):
+    # Rope ZCML must be setup before Plone portal local registry is hooked to a
+    # global registry
     defaultBases = (PLONE_ROPE_ZCML_FIXTURE, plone.app.testing.PLONE_FIXTURE)
 
     def setUp(self):
