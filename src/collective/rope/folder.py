@@ -25,7 +25,7 @@ import ExtensionClass
 
 from collective.rope.basefolder import BaseFolder
 
-manage_addFolderForm = DTMLFile('folderAdd', globals())
+manage_addFolderForm = DTMLFile('dtml/folderAdd', globals())
 
 
 def _my_import(item_class):
@@ -51,7 +51,7 @@ class Folder(BaseFolder):
 
     security.declareProtected(view_management_screens,
                               'manage_main')
-    manage_main = DTMLFile('contents', globals())
+    manage_main = DTMLFile('dtml/contents', globals())
 
     meta_type = 'Rope Folder'
 
