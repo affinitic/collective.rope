@@ -10,9 +10,6 @@ from collective.rope.utils import makeReferenceBag
 
 from collective.rope import cmf_layers
 
-from plone.bbb_testing.zopetestcasecompat import ZTCCompatIntegration
-from plone.bbb_testing.zopetestcasecompat import ZTCCompatFunctional
-
 SIMPLE_ITEM_MAPPER = 'collective.rope.tests.simpleitem.RopeSimpleItem'
 PORTAL_CONTENT_MAPPER = 'collective.rope.tests.portalcontent.RopePortalContent'
 AT_CONTENT_MAPPER = 'collective.rope.tests.atcontent.RopeATContent'
@@ -39,16 +36,9 @@ ROPE_INSTALL = RopeInstall(name="ROPE_INSTALL")
 ROPE_INTEGRATION = z2.IntegrationTesting(bases=(ROPE_FIXTURE,),
     name="ROPE_INTEGRATION")
 
-ROPE_FUNCTIONAL = z2.FunctionalTesting(bases=(ROPE_FIXTURE,),
-    name="ROPE_FUNCTIONAL")
-
-ZTC_ROPE_INTEGRATION = ZTCCompatIntegration(
-    bases=(ROPE_FIXTURE, ),
-    name='ZTC_ROPE_INTEGRATION')
-
-ZTC_ROPE_FUNCTIONAL = ZTCCompatFunctional(
+ROPE_FUNCTIONAL = z2.FunctionalTesting(
     bases=(ROPE_INSTALL, ),
-    name='ZTC_ROPE_FUNCTIONAL')
+    name="ROPE_FUNCTIONAL")
 
 CMF_ROPE_ZCML_FIXTURE = plone.testing.zca.ZCMLSandbox(
     bases=(ROPE_FIXTURE, ),
@@ -83,11 +73,11 @@ PLONE_ROPE_FIXTURE = plone.app.testing.PloneWithPackageLayer(
     gs_profile_id='collective.rope.tests:ropeonat'
     )
 
-PTC_PLONE_ROPE_INTEGRATION = plone.app.testing.layers.IntegrationTesting(
+PLONE_ROPE_INTEGRATION = plone.app.testing.layers.IntegrationTesting(
     bases=(PLONE_ROPE_FIXTURE, ),
     name='PTC_PLONE_ROPE_INTEGRATION')
 
-PTC_PLONE_ROPE_FUNCTIONAL = plone.app.testing.layers.FunctionalTesting(
+PLONE_ROPE_FUNCTIONAL = plone.app.testing.layers.FunctionalTesting(
     bases=(PLONE_ROPE_FIXTURE, ),
     name='PTC_PLONE_ROPE_FUNCTIONAL')
 

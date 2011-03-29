@@ -19,8 +19,8 @@ import transaction
 
 from zope.container.tests.test_icontainer import BaseTestIContainer
 
-from collective.rope.testing import ZTC_ROPE_INTEGRATION
-from collective.rope.testing import ZTC_ROPE_FUNCTIONAL
+from collective.rope.testing import ROPE_INTEGRATION
+from collective.rope.testing import ROPE_FUNCTIONAL
 
 from plone.bbb_testing.zopetestcasecompat import user_name
 from plone.bbb_testing.zopetestcasecompat import user_password
@@ -36,7 +36,7 @@ ITEM_ID = '%s' % ITEM_KEY
 
 
 class FolderTests(ZTCCompatTestCase):
-    layer = ZTC_ROPE_INTEGRATION
+    layer = ROPE_INTEGRATION
 
     def testInstantiateFolder(self):
         manage_addFolder(self.folder,
@@ -57,7 +57,7 @@ class FolderTests(ZTCCompatTestCase):
 
 
 class IContainerTests(ZTCCompatTestCase, BaseTestIContainer):
-    layer = ZTC_ROPE_INTEGRATION
+    layer = ROPE_INTEGRATION
 
     def makeTestObject(self):
         if hasattr(self.folder, FOLDER_ID):
@@ -85,7 +85,7 @@ class IContainerTests(ZTCCompatTestCase, BaseTestIContainer):
 
 
 class FolderBrowserTests(ZTCCompatTestCase):
-    layer = ZTC_ROPE_FUNCTIONAL
+    layer = ROPE_FUNCTIONAL
 
     def afterSetUp(self):
         self.setRoles(['Manager'])

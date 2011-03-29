@@ -21,14 +21,14 @@ from Products.CMFCore.utils import getToolByName
 
 from plone.app.bbb_testing.plonetestcasecompat import PTCCompatTestCase
 
-from collective.rope.testing import PTC_PLONE_ROPE_INTEGRATION
+from collective.rope.testing import PLONE_ROPE_INTEGRATION
 from collective.rope.testing import AT_CONTENT_MAPPER
 
 FOLDER_ID = 'rope'
 
 
 class ATFolderTests(PTCCompatTestCase):
-    layer = PTC_PLONE_ROPE_INTEGRATION
+    layer = PLONE_ROPE_INTEGRATION
 
     def afterSetUp(self):
         self.setRoles(['Manager'])

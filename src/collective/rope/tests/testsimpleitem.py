@@ -22,8 +22,8 @@ from urllib2 import HTTPError
 
 import plone.testing.z2
 
-from collective.rope.testing import ZTC_ROPE_INTEGRATION
-from collective.rope.testing import ZTC_ROPE_FUNCTIONAL
+from collective.rope.testing import ROPE_INTEGRATION
+from collective.rope.testing import ROPE_FUNCTIONAL
 
 from plone.bbb_testing.zopetestcasecompat import user_name
 from plone.bbb_testing.zopetestcasecompat import user_password
@@ -41,7 +41,7 @@ ITEM_VIEW = '%s (%s)' % (ITEM_ID, ITEM_TITLE)
 
 
 class SimpleItemBaseTests(ZTCCompatTestCase):
-    layer = ZTC_ROPE_INTEGRATION
+    layer = ROPE_INTEGRATION
 
     def afterSetUp(self):
         manage_addFolder(self.folder,
@@ -108,7 +108,7 @@ class SimpleItemTestsWithCommits(SimpleItemBaseTests):
 
 
 class ItemBrowserTests(ZTCCompatTestCase):
-    layer = ZTC_ROPE_FUNCTIONAL
+    layer = ROPE_FUNCTIONAL
 
     def afterSetUp(self):
         self.setRoles(['Manager'])
