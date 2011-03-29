@@ -1,6 +1,9 @@
 import sqlalchemy
 
 from plone.testing import z2
+
+from plone.bbb_testing import cmf_layers
+
 import plone.app.testing.layers
 
 import collective.rope
@@ -8,7 +11,6 @@ from collective.rope.utils import makeDictionary
 from collective.rope.utils import compareDictionary
 from collective.rope.utils import makeReferenceBag
 
-from collective.rope import cmf_layers
 
 SIMPLE_ITEM_MAPPER = 'collective.rope.tests.simpleitem.RopeSimpleItem'
 PORTAL_CONTENT_MAPPER = 'collective.rope.tests.portalcontent.RopePortalContent'
