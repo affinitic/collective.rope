@@ -250,15 +250,15 @@ class FunctionalTesting(CMFDefaultTestLifecycle, z2.FunctionalTesting):
 # Note: PORTAL_FIXTURE is defined above
 
 PORTAL_INTEGRATION_TESTING = IntegrationTesting(bases=(PORTAL_FIXTURE,),
-    name='CMFDefault:Integration')
+    name='PORTAL_INTEGRATION_TESTING')
 PORTAL_FUNCTIONAL_TESTING = FunctionalTesting(bases=(PORTAL_FIXTURE,),
-    name='CMFDefault:Functional')
+    name='PORTAL_FUNCTIONAL_TESTING')
 
 PORTAL_ZSERVER = FunctionalTesting(bases=(PORTAL_FIXTURE, z2.ZSERVER_FIXTURE),
-    name='CMFDefault:ZServer')
+    name='PORTAL_ZSERVER')
 PORTAL_FTP_SERVER = FunctionalTesting(
     bases=(PORTAL_FIXTURE, z2.FTP_SERVER_FIXTURE),
-    name='CMFDefault:FTPServer')
+    name='PORTAL_FTP_SERVER')
 
 
 @contextlib.contextmanager
