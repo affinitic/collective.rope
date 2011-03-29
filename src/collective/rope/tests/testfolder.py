@@ -31,8 +31,7 @@ from collective.rope.testing import SIMPLE_ITEM_MAPPER
 from collective.rope.folder import manage_addFolder
 
 FOLDER_ID = 'rope'
-ITEM_KEY = 'rope_first_rf'
-ITEM_ID = '%s' % ITEM_KEY
+ITEM_ID = ITEM_KEY = 'rope_first_rf'
 
 
 class FolderTests(ZTCCompatTestCase):
