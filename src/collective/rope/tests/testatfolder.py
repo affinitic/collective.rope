@@ -22,7 +22,7 @@ from Products.CMFCore.utils import getToolByName
 from collective.rope.plonetestcasecompat import PTCCompatTestCase
 
 from collective.rope.testing import PTC_PLONE_ROPE_INTEGRATION
-from collective.rope.tests.layer import AT_CONTENT_MAPPER
+from collective.rope.testing import AT_CONTENT_MAPPER
 
 FOLDER_ID = 'rope'
 

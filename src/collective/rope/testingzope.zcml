@@ -6,7 +6,7 @@
      <include file="configure.zcml" />
      
      <db:engine name="dummy" url="sqlite:///:file.db"
-             setup="collective.rope.tests.layer.setupDatabase"/>
+             setup="collective.rope.testing.setupDatabase"/>
      <db:session name="" engine="dummy" />
      
      <include package=".tests" file="zope.zcml"/>

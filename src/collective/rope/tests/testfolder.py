@@ -26,7 +26,7 @@ from collective.rope.zopetestcasecompat import user_name
 from collective.rope.zopetestcasecompat import user_password
 from collective.rope.zopetestcasecompat import ZTCCompatTestCase
 
-from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
+from collective.rope.testing import SIMPLE_ITEM_MAPPER
 
 from collective.rope.folder import manage_addFolder
 

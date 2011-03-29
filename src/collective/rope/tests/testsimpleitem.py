@@ -31,7 +31,7 @@ from collective.rope.zopetestcasecompat import ZTCCompatTestCase
 
 from collective.rope.tests.testfolder import FOLDER_ID
 from collective.rope.tests.simpleitem import manage_addRopeSimpleItem
-from collective.rope.tests.layer import SIMPLE_ITEM_MAPPER
+from collective.rope.testing import SIMPLE_ITEM_MAPPER
 from collective.rope.folder import manage_addFolder
 
 ITEM_KEY = 'first_rf'

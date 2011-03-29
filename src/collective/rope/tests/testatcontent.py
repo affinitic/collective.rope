@@ -24,7 +24,7 @@ from collective.rope.plonetestcasecompat import PTCCompatTestCase
 
 from collective.rope.tests.testfolder import FOLDER_ID
 from collective.rope.testing import PTC_PLONE_ROPE_INTEGRATION
-from collective.rope.tests.layer import AT_CONTENT_MAPPER
+from collective.rope.testing import AT_CONTENT_MAPPER
 
 
 ITEM_KEY = 'first_rf'

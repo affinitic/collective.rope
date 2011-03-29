@@ -21,7 +21,7 @@ import transaction
 from Products.CMFCore.utils import getToolByName
 
 from collective.rope.tests.testfolder import FOLDER_ID
-from collective.rope.tests.layer import PORTAL_CONTENT_MAPPER
+from collective.rope.testing import PORTAL_CONTENT_MAPPER
 
 from collective.rope.portaltestcasecompat import PTCCompatTestCase
 from collective.rope.testing import CMF_ROPE_INTEGRATION
