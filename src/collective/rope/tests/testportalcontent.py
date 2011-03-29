@@ -23,7 +23,7 @@ from Products.CMFCore.utils import getToolByName
 from collective.rope.tests.testfolder import FOLDER_ID
 from collective.rope.testing import PORTAL_CONTENT_MAPPER
 
-from collective.rope.portaltestcasecompat import PTCCompatTestCase
+from plone.bbb_testing.portaltestcasecompat import PTCCompatTestCase
 from collective.rope.testing import CMF_ROPE_INTEGRATION
 
 ITEM_KEY = 'first_rf'

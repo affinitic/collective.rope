@@ -22,9 +22,9 @@ from zope.container.tests.test_icontainer import BaseTestIContainer
 from collective.rope.testing import ZTC_ROPE_INTEGRATION
 from collective.rope.testing import ZTC_ROPE_FUNCTIONAL
 
-from collective.rope.zopetestcasecompat import user_name
-from collective.rope.zopetestcasecompat import user_password
-from collective.rope.zopetestcasecompat import ZTCCompatTestCase
+from plone.bbb_testing.zopetestcasecompat import user_name
+from plone.bbb_testing.zopetestcasecompat import user_password
+from plone.bbb_testing.zopetestcasecompat import ZTCCompatTestCase
 
 from collective.rope.testing import SIMPLE_ITEM_MAPPER
 

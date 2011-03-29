@@ -10,8 +10,8 @@ from collective.rope.utils import makeReferenceBag
 
 from collective.rope import cmf_layers
 
-from collective.rope.zopetestcasecompat import ZTCCompatIntegration
-from collective.rope.zopetestcasecompat import ZTCCompatFunctional
+from plone.bbb_testing.zopetestcasecompat import ZTCCompatIntegration
+from plone.bbb_testing.zopetestcasecompat import ZTCCompatFunctional
 
 SIMPLE_ITEM_MAPPER = 'collective.rope.tests.simpleitem.RopeSimpleItem'
 PORTAL_CONTENT_MAPPER = 'collective.rope.tests.portalcontent.RopePortalContent'

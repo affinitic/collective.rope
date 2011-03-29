@@ -20,7 +20,7 @@ import transaction
 
 from Products.CMFCore.utils import getToolByName
 
-from collective.rope.plonetestcasecompat import PTCCompatTestCase
+from plone.app.bbb_testing.plonetestcasecompat import PTCCompatTestCase
 
 from collective.rope.tests.testfolder import FOLDER_ID
 from collective.rope.testing import PTC_PLONE_ROPE_INTEGRATION

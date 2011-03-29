@@ -32,7 +32,8 @@ setup(name='collective.rope',
                'Plone',
                ],
           test=[
-               'plone.app.testing',
+               'plone.bbb_testing',
+               'plone.app.bbb_testing',
                ],
       ),
       entry_points="""
