@@ -100,7 +100,7 @@ class FolderBrowserTests(ZTCCompatTestCase):
     def testAddRopeFolder(self):
         browser = self.browser
         browser.open(self.folder_path)
-        url = (self.folder_path + \
+        url = (self.folder_path +
                 '/manage_addProduct/collective.rope/folderAdd')
         browser.open(url)
         ctl = browser.getControl(name='id')
