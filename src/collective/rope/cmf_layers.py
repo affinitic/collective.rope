@@ -179,7 +179,7 @@ class PortalFixture(Layer):
 # CMFDefault fixture layer instance. Should not be used on its own, but as a
 # base for other layers.
 
-PORTAL_FIXTURE = PortalFixture()
+PORTAL_FIXTURE = PortalFixture(name='PORTAL_FIXTURE')
 
 
 class CMFDefaultTestLifecycle(object):
