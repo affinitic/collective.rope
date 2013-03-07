@@ -160,5 +160,5 @@ def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(PortalTests))
     suite.addTest(unittest.makeSuite(PortalContentTests))
-    suite.addTest(unittest.makeSuite(PortalContentTestsWithCommits))
+    #suite.addTest(unittest.makeSuite(PortalContentTestsWithCommits))
     return suite

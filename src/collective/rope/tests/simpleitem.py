@@ -17,10 +17,10 @@
 
 from App.special_dtml import DTMLFile
 from App.class_init import InitializeClass
+from AccessControl import ClassSecurityInfo
 
 from OFS.PropertyManager import PropertyManager
 
-from AccessControl import ClassSecurityInfo
 from AccessControl.Owned import Owned
 from AccessControl.Permissions import view as View
 

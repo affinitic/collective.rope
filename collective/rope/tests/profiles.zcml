@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="cmf_default">
+
+  <genericsetup:registerProfile
+      name="ropeoncmf"
+      title="Rope On CMFDefault Tests"
+      directory="profiles/ropeoncmf"
+      description="Tests of Rope content in CMFDefault site."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      for="Products.CMFCore.interfaces.ISiteRoot"
+      />
+
+  <genericsetup:registerProfile
+      name="ropeonat"
+      title="Rope On Archetypes Tests"
+      directory="profiles/ropeonat"
+      description="Tests of Rope content in Plone site"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      />
+
+</configure>

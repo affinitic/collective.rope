@@ -47,15 +47,11 @@ class BasePortalContent(BaseSimpleItem, DynamicType, CMFCatalogAware):
     implements(IContentish)
 
     manage_options = (({'label': 'Dublin Core',
-                        'action': 'manage_metadata',
-                       },
-                       {'label': 'Edit',
-                        'action': 'manage_edit',
-                       },
-                       {'label': 'View',
-                        'action': 'view',
-                       },
-                       )
+                        'action': 'manage_metadata'},
+                        {'label': 'Edit',
+                         'action': 'manage_edit'},
+                        {'label': 'View',
+                         'action': 'view'})
                      + CMFCatalogAware.manage_options
                      + PropertyManager.manage_options
                      + Owned.manage_options

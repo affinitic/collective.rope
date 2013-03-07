@@ -298,16 +298,17 @@ class BaseFolder(Folder):
 
     def __getObjectFromSA__(self, path):
         #database access
-        if not self.item_class:
-            raise ValueError('mapperName not set')
-        key = IKeyIdSubobjectSupport(self).makeKeyFromId(path)
-        query = self.saSession.query(self.item_class)
-        query = query.with_polymorphic('*')
-        subobject = query.get(key)
-        # subobject could have already been deleted
-        if subobject in self.saSession.deleted:
-            # but a new object with the same key could have been created
-            subobject = self.__getNewFromSA(key)
+        if self.item_class:
+            key = IKeyIdSubobjectSupport(self).makeKeyFromId(path)
+            query = self.saSession.query(self.item_class)
+            query = query.with_polymorphic('*')
+            # TODO subobject = query.get() maybe marginally
+            # more efficient but does not work due to some
+            # obscure sqlalchemy bug: when an object is in the session
+            # and the scalar attributes are unloaded, the attribute
+            # are not reloaded after a get...
+            query = query.filter(self.item_class.key == key)
+            subobject = query.first()
             if subobject is None:
                 raise KeyError
         elif subobject is None:

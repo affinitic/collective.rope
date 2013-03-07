@@ -25,13 +25,10 @@ from plone.app.bbb_testing.plonetestcasecompat import PTCCompatTestCase
 from collective.rope.tests.testfolder import FOLDER_ID
 from collective.rope.testing import PLONE_ROPE_INTEGRATION
 from collective.rope.testing import AT_CONTENT_MAPPER
-
-
 ITEM_KEY = 'first_rf'
 ITEM_ID = '%s' % ITEM_KEY
 ITEM_TITLE = 'First Rope ATContent'
 ITEM_VIEW = '%s (%s)' % (ITEM_ID, ITEM_TITLE)
-
 
 class ATContentBaseTests(PTCCompatTestCase):
     layer = PLONE_ROPE_INTEGRATION

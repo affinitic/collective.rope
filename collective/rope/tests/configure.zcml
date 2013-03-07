@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:five="http://namespaces.zope.org/five"
+           xmlns:db="http://namespaces.zope.org/db"
+           >
+
+    <include package="z3c.saconfig" file="meta.zcml"/>
+
+    <!-- db:engine name="collective.rope.tests" url="sqlite:///:memory:"
+               echo="False"
+               setup="collective.rope.tests.layer.setupDatabase"/>
+	<db:session name="" engine="collective.rope.tests" / -->
+
+
+    <adapter for="collective.rope.interfaces.IRDBFolder"
+             factory="collective.rope.basefolder.KeyIdSubobjectSupport" 
+             provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
+    
+    <adapter for="collective.rope.baseatcontent.BaseContentMixin"
+             factory="collective.rope.baseatcontent.KeyIdSubobjectSupport" 
+             provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
+    
+    <adapter for="collective.rope.baseportalcontent.BasePortalContent"
+             factory="collective.rope.baseatcontent.KeyIdSubobjectSupport" 
+             provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
+
+    <adapter for="collective.rope.interfaces.IStoredInRDB"
+             factory="collective.rope.basefolder.KeyIdSubobjectSupport" 
+             provides="collective.rope.interfaces.IKeyIdSubobjectSupport" />
+
+    <include file="content.zcml"/>
+
+    <include file="profiles.zcml"/>
+    
+</configure>

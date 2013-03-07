@@ -25,6 +25,9 @@ from collective.rope.testing import PLONE_ROPE_INTEGRATION
 from collective.rope.testing import AT_CONTENT_MAPPER
 
 FOLDER_ID = 'rope'
+# The order here is important: We first call the deferred function and then
+# let PloneTestCase install it during Plone site setup
+FOLDER_ID = 'rope'
 
 
 class ATFolderTests(PTCCompatTestCase):

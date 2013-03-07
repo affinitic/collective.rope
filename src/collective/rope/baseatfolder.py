@@ -131,7 +131,7 @@ class BaseFolderMixin(CatalogMultiplex,
             item = self._getOb(id)
             if not _checkPermission(permissions.DeleteObjects, item):
                 raise Unauthorized(
-                    "Do not have permissions to remove this object")
+                        "Do not have permissions to remove this object")
         return BasePortalFolder.manage_delObjects(self, ids, REQUEST=REQUEST)
 
     security.declareProtected(permissions.ListFolderContents,
@@ -142,7 +142,7 @@ class BaseFolderMixin(CatalogMultiplex,
         with a dot.
         """
         contents = BasePortalFolder.listFolderContents(self,
-            contentFilter=contentFilter)
+                contentFilter=contentFilter)
         if suppressHiddenFiles:
             contents = [obj for obj in contents if obj.getId()[:1] != '.']
 

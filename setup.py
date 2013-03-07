@@ -13,9 +13,9 @@ setup(name='collective.rope',
         "Programming Language :: Python",
         ],
       keywords='',
-      author='Godefroid Chapelle',
-      author_email='gotcha@bubblenet.be',
-      url='',
+      author='Plone Community',
+      author_email='plone@plone.org',
+      url='http://svn.plone.org/svn/collective/collective.rope',
       license='GPL',
       packages=find_packages('src'),
       package_dir={'': 'src'},
@@ -32,11 +32,8 @@ setup(name='collective.rope',
                'Plone',
                ],
           test=[
+               'mock',
                'plone.bbb_testing',
                'plone.app.bbb_testing',
                ],
-      ),
-      entry_points="""
-      # -*- Entry points: -*-
-      """,
-      )
+      ))

@@ -27,15 +27,17 @@ from plone.bbb_testing.zopetestcasecompat import user_password
 from plone.bbb_testing.zopetestcasecompat import ZTCCompatTestCase
 
 from collective.rope.testing import SIMPLE_ITEM_MAPPER
-
 from collective.rope.folder import manage_addFolder
 
 FOLDER_ID = 'rope'
 ITEM_ID = ITEM_KEY = 'rope_first_rf'
 
+# The order here is important: We first call the deferred function and then
+# let ZopeTestCase install it
 
 class FolderTests(ZTCCompatTestCase):
     layer = ROPE_INTEGRATION
+
 
     def testInstantiateFolder(self):
         manage_addFolder(self.folder,
@@ -53,6 +55,11 @@ class FolderTests(ZTCCompatTestCase):
             FOLDER_ID, SIMPLE_ITEM_MAPPER)
         rope = getattr(self.folder, FOLDER_ID)
         self.assertRaises(AttributeError, rope._getOb, 'notfound')
+
+try:
+    from zope.app.container.tests.test_icontainer import BaseTestIContainer
+except ImportError:
+    from zope.container.tests.test_icontainer import BaseTestIContainer
 
 
 class IContainerTests(ZTCCompatTestCase, BaseTestIContainer):

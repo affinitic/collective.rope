@@ -15,6 +15,8 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
+from App.special_dtml import DTMLFile
+from App.class_init import InitializeClass
 from AccessControl import ClassSecurityInfo
 from App.special_dtml import DTMLFile
 from App.class_init import InitializeClass
