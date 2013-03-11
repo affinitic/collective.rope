@@ -36,10 +36,9 @@ from interfaces import IRDBFolder
 from interfaces import IKeyIdSubobjectSupport
 
 from zope.event import notify
-from zope.app.container.interfaces import IContainer
-from zope.app.container.contained import ObjectAddedEvent
-from zope.app.container.contained import ObjectRemovedEvent
-from zope.app.container.contained import notifyContainerModified
+from zope.container.interfaces import IContainer
+from zope.lifecycleevent import ObjectAddedEvent, ObjectRemovedEvent
+from zope.container.contained import notifyContainerModified
 from OFS.event import ObjectWillBeAddedEvent
 from OFS.event import ObjectWillBeRemovedEvent
 import OFS.subscribers
