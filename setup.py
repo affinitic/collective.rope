@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '1.0dev'
+version = '0.2dev'
 
 setup(name='collective.rope',
       version=version,

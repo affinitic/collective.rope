@@ -1,7 +1,14 @@
 Changelog
 =========
 
-1.0 (Unreleased)
+
+0.2 (unreleased)
 ----------------
 
-- First public release.
+- Fix imports for plone 4.3
+
+
+0.1 (2010-05-20)
+----------------
+
+- First release.
