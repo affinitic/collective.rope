@@ -2,10 +2,10 @@ Changelog
 =========
 
 
-0.3 (unreleased)
+0.3 (2013-03-15)
 ----------------
 
-- Nothing changed yet.
+- Fix release
 
 
 0.2 (2013-03-15)
